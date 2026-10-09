@@ -282,10 +282,10 @@
       <button class="nav-item active flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-sm font-semibold" data-section="home"><i class="fa-solid fa-house w-5 text-center"></i><span class="nav-label">Mi vida</span></button>
       <button class="nav-item flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-sm font-semibold" data-section="education"><i class="fa-solid fa-graduation-cap w-5 text-center"></i><span class="nav-label">Educación</span></button>
       <button class="nav-item flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-sm font-semibold" data-section="jobs"><i class="fa-solid fa-briefcase w-5 text-center"></i><span class="nav-label">Trabajos</span></button>
-      <button class="nav-item locked flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-sm font-semibold" data-section="market" data-level="5"><i class="fa-solid fa-lock w-5 text-center"></i><span class="nav-label">Mercado <small class="lock-copy ml-1 text-xs text-electric">Nv. 5</small></span></button>
-      <button class="nav-item locked flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-sm font-semibold" data-section="casino" data-level="10"><i class="fa-solid fa-lock w-5 text-center"></i><span class="nav-label">Casino <small class="lock-copy ml-1 text-xs text-gold">Nv. 10</small></span></button>
-      <button class="nav-item locked flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-sm font-semibold" data-section="business" data-level="15"><i class="fa-solid fa-lock w-5 text-center"></i><span class="nav-label">Negocios <small class="lock-copy ml-1 text-xs text-electric">Nv. 15</small></span></button>
-      <button class="nav-item locked flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-sm font-semibold" data-section="mafia" data-level="20"><i class="fa-solid fa-lock w-5 text-center"></i><span class="nav-label">Submundo <small class="lock-copy ml-1 text-xs text-danger">Nv. 20</small></span></button>
+      <button class="nav-item locked flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-sm font-semibold" data-section="market" data-icon="fa-chart-line" data-level="5"><i class="fa-solid fa-lock w-5 text-center"></i><span class="nav-label">Mercado <small class="lock-copy ml-1 text-xs text-electric">Nv. 5</small></span></button>
+      <button class="nav-item locked flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-sm font-semibold" data-section="casino" data-icon="fa-dice" data-level="10"><i class="fa-solid fa-lock w-5 text-center"></i><span class="nav-label">Casino <small class="lock-copy ml-1 text-xs text-gold">Nv. 10</small></span></button>
+      <button class="nav-item locked flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-sm font-semibold" data-section="business" data-icon="fa-building" data-level="15"><i class="fa-solid fa-lock w-5 text-center"></i><span class="nav-label">Negocios <small class="lock-copy ml-1 text-xs text-electric">Nv. 15</small></span></button>
+      <button class="nav-item locked flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-sm font-semibold" data-section="mafia" data-icon="fa-mask-face" data-level="20"><i class="fa-solid fa-lock w-5 text-center"></i><span class="nav-label">Submundo <small class="lock-copy ml-1 text-xs text-danger">Nv. 20</small></span></button>
     </nav>
     <div class="save-box mt-auto rounded-2xl border border-slate-700/50 bg-slate-900/45 p-3">
       <div class="flex items-center gap-2 text-xs font-semibold text-slate-300"><i class="fa-solid fa-cloud-arrow-down text-neon"></i><span class="nav-label">Guardado automático</span></div>
@@ -484,7 +484,7 @@
       document.getElementById("level-value").textContent = gameState.level; document.getElementById("xp-label").textContent = `${gameState.xp} / ${levelXp()} XP`; document.getElementById("xp-bar").style.width = `${Math.min(100, gameState.xp / levelXp() * 100)}%`;
       const titles = ["novato", "en progreso", "promesa", "especialista", "visionario"]; document.getElementById("level-title").textContent = titles[Math.min(titles.length - 1, Math.floor((gameState.level - 1) / 3))];
       document.getElementById("goal-pct").textContent = `${Math.min(100, Math.round(gameState.xp / levelXp() * 100))}%`; document.getElementById("goal-bar").style.width = `${Math.min(100, gameState.xp / levelXp() * 100)}%`;
-      document.querySelectorAll(".nav-item[data-level]").forEach(item => { const unlocked = isAdmin || gameState.level >= Number(item.dataset.level); item.classList.toggle("locked", !unlocked); const icon = item.querySelector("i"); icon.className = `${unlocked ? "fa-solid fa-unlock" : "fa-solid fa-lock"} w-5 text-center`; });
+      document.querySelectorAll(".nav-item[data-level]").forEach(item => { const unlocked = isAdmin || gameState.level >= Number(item.dataset.level); item.classList.toggle("locked", !unlocked); const icon = item.querySelector("i"); icon.className = `fa-solid ${unlocked ? (item.dataset.icon || "fa-unlock") : "fa-lock"} w-5 text-center`; });
       renderEducation(); renderJobs(); document.getElementById("mg-count").textContent = jobs.filter(j => Minigames.has(j.id)).length;
     }
     /* ============ MERCADO FINANCIERO · FASES 1-2 ============
@@ -501,11 +501,11 @@
       { id: "btc", name: "Bitcoin", tag: "Muy volátil", icon: "fa-bitcoin-sign", p0: 300, mu: .25, sigma: .85, col: "#ffd166" },
       { id: "meme", name: "Meme Coin", tag: "Riesgo extremo · pumps y desplomes", icon: "fa-rocket", p0: 2.5, mu: MEME_MU, sigma: MEME_SIGMA, rev: MEME_REV, min: .05, col: "#f472b6" }
     ];
-    let mSel = "sp500", mTimer = 0, mTicks = 0, mChart = null, mAsset = "", mRef = null;
+    let mSel = "sp500", mMode = "buy", mTimer = 0, mTicks = 0, mChart = null, mAsset = "", mRef = null;
     const mEl = id => document.getElementById(id), r2 = v => Math.round(v * 100) / 100;
     const mGauss = () => { let u = 0; while (!u) u = Math.random(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(6.2832 * Math.random()); };
     const mHist = id => gameState.market.history[id], mPrice = id => { const h = mHist(id); return h ? h[h.length - 1] : 0; };
-    const mPct = v => (v >= 0 ? "+" : "") + (v * 100).toFixed(2) + " %", mEur = v => (v >= 0 ? "+" : "") + moneyFormat(r2(v));
+    const mQty = v => new Intl.NumberFormat("es-ES", { maximumFractionDigits: 4 }).format(v), mPct = v => (v >= 0 ? "+" : "") + (v * 100).toFixed(2) + " %", mEur = v => (v >= 0 ? "+" : "") + moneyFormat(r2(v));
     function marketStep(a) {
       const m = gameState.market, h = (m.history[a.id] ||= [a.p0]); m.trend ||= {};
       const tr = m.trend[a.id] = (m.trend[a.id] || 0) * .96 + mGauss() * a.sigma * .8, last = h[h.length - 1];
@@ -532,6 +532,33 @@
       }
       render(); save(); marketUI();
     }
+    /* Operar por IMPORTE en euros (posiciones fraccionarias, 6 decimales). Comprar: gasta exactamente eur. Vender: retira eur (si queda < 0,01 € se vende todo). */
+    function marketTradeEur(id, side, eur) {
+      const price = mPrice(id), pf = (gameState.market.portfolio[id] ||= { qty: 0, cost: 0 }), f6 = v => Math.round(v * 1e6) / 1e6;
+      if (!(price > 0)) return;
+      if (!(eur >= 1)) return showToast("Importe mínimo", "Introduce al menos 1 € para operar.", "electric");
+      if (side === "buy") {
+        if (gameState.cleanMoney < eur - 1e-9) return showToast("Fondos insuficientes", "No tienes dinero limpio para esa compra.", "danger");
+        const q = Math.floor(eur / price * 1e6) / 1e6; if (!(q > 0)) return;
+        gameState.cleanMoney = r2(gameState.cleanMoney - eur); pf.qty = f6(pf.qty + q); pf.cost = r2(pf.cost + eur); beep(620, .07, "triangle", .04);
+      } else {
+        const val = pf.qty * price; if (!(pf.qty > 0) || val < .01) return showToast("Sin posición", "No tienes acciones de este activo para vender.", "danger");
+        const all = eur >= val - .01, q = all ? pf.qty : Math.floor(eur / price * 1e6) / 1e6, got = all ? r2(val) : eur, avg = pf.cost / pf.qty, gain = got - avg * q;
+        gameState.cleanMoney = r2(gameState.cleanMoney + got); pf.cost = all ? 0 : r2(pf.cost - avg * q); pf.qty = all ? 0 : f6(pf.qty - q); if (pf.qty <= 0) { pf.qty = 0; pf.cost = 0; }
+        showToast(gain >= 0 ? "Venta con beneficio" : "Venta con pérdida", `${mEur(gain)} en esta operación.`, gain >= 0 ? "neon" : "danger"); beep(gain >= 0 ? 880 : 200, .1, "sine", .04);
+      }
+      render(); save(); marketUI();
+    }
+    const mkAmt = () => { const v = parseFloat(String(mEl("mk-amt").value).replace(",", ".")); return isFinite(v) && v > 0 ? r2(v) : 0; };
+    function mkTradeUI() {
+      const root = mEl("market"); if (!root || !root.dataset.built) return;
+      const a = MARKET_ASSETS.find(x => x.id === mSel), p = mPrice(a.id), pf = gameState.market.portfolio[a.id] || { qty: 0, cost: 0 }, cash = gameState.cleanMoney, pos = pf.qty * p, buy = mMode === "buy", amt = mkAmt(), base = buy ? cash : pos;
+      root.querySelectorAll("[data-mk-mode]").forEach(b => { const on = b.dataset.mkMode === mMode; b.className = "btn-juice min-h-[40px] rounded-lg text-sm font-extrabold " + (on ? (b.dataset.mkMode === "buy" ? "bg-neon text-ink" : "bg-danger text-white") : "text-slate-400"); b.setAttribute("aria-pressed", String(on)); });
+      mEl("mk-amt-label").textContent = buy ? `Dinero a invertir · Disponible ${moneyFormat(r2(cash))}` : `Dinero a retirar · En ${a.name}: ${moneyFormat(r2(pos))}`;
+      const over = amt > base + .005, bad = buy ? (over || amt < 1) : (pos < .01 || amt < 1);
+      mEl("mk-prev").innerHTML = !amt ? "Escribe un importe o elige uno rápido" : over ? (buy ? `<span class="text-danger">Supera tu saldo disponible</span>` : `<span class="text-gold">Supera tu posición: se venderá todo</span>`) : `≈ <b class="text-white">${mQty(amt / p)}</b> uds a ${moneyFormat(p)}`;
+      const go = mEl("mk-go"); go.textContent = (buy ? "Comprar" : "Vender") + (amt ? " " + moneyFormat(amt) : ""); go.className = "btn-juice min-h-[52px] w-full rounded-xl text-sm font-extrabold " + (buy ? "bg-neon text-ink" : "bg-danger text-white") + (bad ? " opacity-40" : ""); go.setAttribute("aria-disabled", String(bad));
+    }
     function marketBuild() {
       const root = mEl("market"); if (root.dataset.built) return; root.dataset.built = "1";
       const btn = (t, l, cls) => `<button data-trade="${t}" class="btn-juice min-h-[48px] rounded-xl px-2 text-xs font-extrabold ${cls}">${l}</button>`;
@@ -539,10 +566,17 @@
         <div class="mb-4 grid grid-cols-2 gap-3"><div class="glass rounded-2xl p-3"><p class="text-[11px] text-slate-400">Invertido (valor)</p><b id="mk-value" class="text-lg text-white">0 €</b></div><div class="glass rounded-2xl p-3"><p class="text-[11px] text-slate-400">Ganancia / pérdida</p><b id="mk-pnl" class="text-lg text-white">0 €</b></div></div>
         <div class="mb-4 grid gap-3">${MARKET_ASSETS.map(a => `<button data-asset="${a.id}" class="glass w-full rounded-2xl p-4 text-left"><div class="flex items-center justify-between"><div class="flex items-center gap-3"><span class="flex h-10 w-10 items-center justify-center rounded-xl text-lg" style="background:${a.col}22;color:${a.col}"><i class="fa-solid ${a.icon}"></i></span><div><p class="font-bold text-white">${a.name}</p><p class="text-[11px] text-slate-400">${a.tag}</p></div></div><div class="text-right"><p id="mk-p-${a.id}" class="font-black text-white"></p><p id="mk-c-${a.id}" class="text-xs font-bold"></p></div></div><p id="mk-h-${a.id}" class="mt-2 text-[11px] text-slate-400"></p></button>`).join("")}</div>
         <div id="mk-panel" class="glass scroll-mt-36 rounded-2xl p-4"><p id="mk-title" class="mb-2 font-bold text-white"></p><div class="relative h-52"><canvas id="market-chart"></canvas><p id="mk-nochart" class="absolute inset-0 hidden items-center justify-center text-center text-xs text-slate-400">Gráfico no disponible (no se pudo cargar Chart.js).</p></div><p id="mk-pos" class="my-3 text-xs text-slate-300"></p>
-        <div class="grid grid-cols-3 gap-2">${btn("buy:1", "Comprar 1", "bg-neon text-ink")}${btn("buy:10", "Comprar 10", "bg-neon text-ink")}${btn("buy:max", "Comprar máx", "bg-neon text-ink")}${btn("sell:1", "Vender 1", "bg-danger text-white")}${btn("sell:10", "Vender 10", "bg-danger text-white")}${btn("sell:all", "Vender todo", "bg-danger text-white")}</div></div>`;
+        <div class="mt-1"><div class="mb-3 grid grid-cols-2 gap-1 rounded-xl bg-slate-900/60 p-1"><button data-mk-mode="buy">Comprar</button><button data-mk-mode="sell">Vender</button></div><label id="mk-amt-label" for="mk-amt" class="mb-1 block text-[11px] font-semibold text-slate-400"></label><div class="relative"><input id="mk-amt" type="text" inputmode="decimal" autocomplete="off" placeholder="0" class="w-full rounded-xl border border-slate-700 bg-slate-900/70 px-3 py-3 pr-9 text-lg font-black text-white outline-none focus:border-electric"><span class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 font-bold text-slate-400">€</span></div><div class="mt-2 grid grid-cols-4 gap-1.5"><button data-mk-chip="eur:10" class="btn-juice min-h-[40px] rounded-lg bg-slate-800 text-xs font-bold text-slate-200">10 €</button><button data-mk-chip="eur:50" class="btn-juice min-h-[40px] rounded-lg bg-slate-800 text-xs font-bold text-slate-200">50 €</button><button data-mk-chip="eur:100" class="btn-juice min-h-[40px] rounded-lg bg-slate-800 text-xs font-bold text-slate-200">100 €</button><button data-mk-chip="eur:500" class="btn-juice min-h-[40px] rounded-lg bg-slate-800 text-xs font-bold text-slate-200">500 €</button></div><div class="mt-1.5 grid grid-cols-4 gap-1.5"><button data-mk-chip="pct:25" class="btn-juice min-h-[40px] rounded-lg bg-slate-800 text-xs font-bold text-slate-200">25 %</button><button data-mk-chip="pct:50" class="btn-juice min-h-[40px] rounded-lg bg-slate-800 text-xs font-bold text-slate-200">50 %</button><button data-mk-chip="pct:75" class="btn-juice min-h-[40px] rounded-lg bg-slate-800 text-xs font-bold text-slate-200">75 %</button><button data-mk-chip="pct:100" class="btn-juice min-h-[40px] rounded-lg bg-slate-800 text-xs font-bold text-slate-200">Todo</button></div><p id="mk-prev" class="my-3 text-center text-xs text-slate-300"></p><button id="mk-go" data-mk-go></button></div></div>`;
+      root.addEventListener("input", e => { if (e.target.id === "mk-amt") { e.target.value = e.target.value.replace(/[^0-9.,]/g, ""); mkTradeUI(); } });
       root.addEventListener("click", e => {
-        const t = e.target.closest("[data-trade]"), c = e.target.closest("[data-asset]");
-        if (t) { const [side, q] = t.dataset.trade.split(":"); marketTrade(mSel, side, isNaN(q) ? q : +q); }
+        const t = e.target.closest("[data-trade]"), c = e.target.closest("[data-asset]"), md = e.target.closest("[data-mk-mode]"), ch = e.target.closest("[data-mk-chip]"), go = e.target.closest("[data-mk-go]");
+        if (md) { mMode = md.dataset.mkMode; mkTradeUI(); }
+        else if (ch) {
+          const [k, v] = ch.dataset.mkChip.split(":"), base = mMode === "buy" ? gameState.cleanMoney : (gameState.market.portfolio[mSel]?.qty || 0) * mPrice(mSel), amt = k === "eur" ? +v : Math.floor(Math.max(0, base) * +v) / 100;
+          mEl("mk-amt").value = amt > 0 ? String(amt).replace(".", ",") : ""; mkTradeUI();
+        }
+        else if (go) marketTradeEur(mSel, mMode, mkAmt());
+        else if (t) { const [side, q] = t.dataset.trade.split(":"); marketTrade(mSel, side, isNaN(q) ? q : +q); }
         else if (c) {
           const changed = mSel !== c.dataset.asset; mSel = c.dataset.asset; marketUI();
           const panel = mEl("mk-panel"), r = panel.getBoundingClientRect(); if (changed && (r.top > innerHeight * .6 || r.bottom < 0)) panel.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -583,15 +617,15 @@
       for (const a of MARKET_ASSETS) {
         const h = mHist(a.id), p = h[h.length - 1], ch = p / (h[h.length - 2] ?? p) - 1, pf = gameState.market.portfolio[a.id] || { qty: 0, cost: 0 }, val = pf.qty * p; tv += val; tc += pf.cost;
         mEl("mk-p-" + a.id).textContent = moneyFormat(p); const c = mEl("mk-c-" + a.id); c.textContent = mPct(ch); c.className = "text-xs font-bold " + (ch >= 0 ? "text-neon" : "text-danger");
-        mEl("mk-h-" + a.id).textContent = pf.qty ? `Tienes ${pf.qty} · PnL ${mEur(val - pf.cost)}` : "Sin posición";
+        mEl("mk-h-" + a.id).textContent = pf.qty ? `Tienes ${mQty(pf.qty)} · PnL ${mEur(val - pf.cost)}` : "Sin posición";
         const card = document.querySelector(`[data-asset="${a.id}"]`); card.classList.toggle("border-neon/60", a.id === mSel); card.style.borderColor = a.id === mSel ? a.col : ""; card.setAttribute("aria-pressed", String(a.id === mSel));
       }
       const cash = gameState.cleanMoney, cashEl = mEl("mk-cash"); cashEl.textContent = moneyFormat(r2(cash)); cashEl.className = "text-lg font-black " + (cash < 0 ? "text-danger" : "text-neon");
       mEl("mk-value").textContent = moneyFormat(r2(tv)); const pn = mEl("mk-pnl"); pn.textContent = mEur(tv - tc); pn.className = "text-lg font-black " + (tv - tc >= 0 ? "text-neon" : "text-danger");
       const a = MARKET_ASSETS.find(x => x.id === mSel), h = mHist(a.id), pf = gameState.market.portfolio[a.id] || { qty: 0, cost: 0 }, p = mPrice(a.id), pnl = pf.qty * p - pf.cost, win = p / h[0] - 1, maxBuy = Math.max(0, Math.floor(cash / p));
       mEl("mk-title").innerHTML = `${a.name} · ${moneyFormat(p)} <span class="ml-1 text-xs font-bold ${win >= 0 ? "text-neon" : "text-danger"}">${mPct(win)} · ${h.length - 1} d</span>`;
-      mEl("mk-pos").innerHTML = (pf.qty ? `Posición: <b>${pf.qty}</b> · Coste medio ${moneyFormat(r2(pf.cost / pf.qty))} · PnL <b class="${pnl >= 0 ? "text-neon" : "text-danger"}">${mEur(pnl)} (${mPct(pf.cost ? pnl / pf.cost : 0)})</b>` : "No tienes acciones de este activo.") + `<br><span class="text-slate-400">Puedes comprar hasta ${maxBuy} · Saldo ${moneyFormat(r2(cash))}</span>`;
-      root.querySelectorAll("[data-trade]").forEach(b => { const [s, q] = b.dataset.trade.split(":"), ok = s === "buy" ? maxBuy >= (q === "max" ? 1 : +q) : pf.qty >= 1; b.classList.toggle("opacity-40", !ok); b.setAttribute("aria-disabled", String(!ok)); });
+      mEl("mk-pos").innerHTML = (pf.qty ? `Posición: <b>${mQty(pf.qty)}</b> · Coste medio ${moneyFormat(r2(pf.cost / pf.qty))} · PnL <b class="${pnl >= 0 ? "text-neon" : "text-danger"}">${mEur(pnl)} (${mPct(pf.cost ? pnl / pf.cost : 0)})</b>` : "No tienes acciones de este activo.") + `<br><span class="text-slate-400">Valor actual ${moneyFormat(r2(pf.qty * p))} · Saldo ${moneyFormat(r2(cash))}</span>`;
+      mkTradeUI();
       marketChart(a, h);
     }
     /* Simulación por reloj de pared: cada llamada avanza los ticks que "tocan" desde m.lastTick. Sirve igual para el bucle normal (1 tick),
