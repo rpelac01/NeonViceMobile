@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
   <meta name="theme-color" content="#07111f" />
   <title>Neon Vice — Vida, dinero y poder</title>
   <script src="https://cdn.tailwindcss.com"></script>
@@ -149,6 +149,103 @@
     .mu-pips { display: flex; flex-wrap: wrap; justify-content: center; align-content: center; gap: 1px; width: 72%; margin-top: 8px; }
     .mu-fig { display: flex; flex-direction: column; align-items: center; margin-top: 8px; font-size: 8px; font-weight: 800; }
     .cs-sm .mu-pips, .cs-sm .mu-fig { margin-top: 5px; } .cs-sm .mu-fig b { display: none; }
+    /* ===== CASINO · FASE 2: lobby + juegos a pantalla completa, Mus con canvas, tragaperras ICE QUEEN ===== */
+    .cs-gcard { display: flex; width: 100%; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 16px; text-align: left; color: #e7effa; background: linear-gradient(135deg, rgba(16,29,50,.92), rgba(9,17,32,.92)); border: 1px solid rgba(148,181,220,.16); min-height: 68px; }
+    .cs-gcard > i { flex: none; display: flex; width: 44px; height: 44px; align-items: center; justify-content: center; border-radius: 12px; font-size: 20px; color: #ffd166; background: rgba(255,209,102,.12); }
+    .cs-gcard b { display: block; font-size: 14px; font-weight: 800; }
+    .cs-gcard small { display: block; margin-top: 2px; font-size: 11px; color: #9fb3cc; }
+    .cs-gcard.is-ice { background: linear-gradient(135deg, #07204a, #145090 58%, #2b1a74); border-color: rgba(125,249,255,.55); box-shadow: 0 0 22px rgba(125,249,255,.22); }
+    .cs-gcard.is-ice > i { color: #7df9ff; background: rgba(125,249,255,.14); }
+    #cs-game { position: fixed; inset: 0; z-index: 60; height: 100vh; height: 100dvh; flex-direction: column; background: radial-gradient(circle at 50% 0, #12223f, #070d1a 70%); }
+    #cs-game:not(.hidden) { display: flex; }
+    #cs-game.hidden { display: none; }
+    #cs-game[data-g="sl"] { background: linear-gradient(#030c22, #06204a 55%, #0a3566); }
+    .cs-top { flex: none; display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 8px; padding: max(8px, env(safe-area-inset-top)) 12px 8px; background: rgba(5,10,22,.82); border-bottom: 1px solid rgba(148,181,220,.14); }
+    .cs-exit { display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 14px 0 12px; border-radius: 12px; font-size: 13px; font-weight: 800; color: #ffc2cb; background: rgba(255,93,117,.14); border: 1px solid rgba(255,93,117,.5); }
+    .cs-gtitle { text-align: center; font-size: 12px; font-weight: 900; letter-spacing: .2em; text-transform: uppercase; color: #ffd166; }
+    .cs-gchips { display: flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 12px; border-radius: 12px; font-size: 13px; background: rgba(255,209,102,.1); border: 1px solid rgba(255,209,102,.3); color: #ffd166; }
+    .cs-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; display: flex; flex-direction: column; padding: 10px 12px calc(14px + env(safe-area-inset-bottom)); }
+    .cs-inner { display: flex; flex: 1 0 auto; flex-direction: column; width: 100%; max-width: 560px; margin: 0 auto; }
+    #cs-chipbar { display: flex; flex: none; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 10px; padding: 8px 12px; border-radius: 16px; background: rgba(16,29,50,.82); border: 1px solid rgba(148,181,220,.12); }
+    #cs-chipbar.hidden { display: none; }
+    /* Mus: mesa en canvas con bocadillos */
+    #cs-p-mu:not(.hidden) { display: flex; flex: 1 0 auto; flex-direction: column; }
+    .mu-hud { display: flex; flex: none; align-items: center; justify-content: space-between; padding: 2px 4px 8px; font-size: 12px; font-weight: 800; color: #e2e8f0; }
+    .mu-stage { position: relative; flex: 1 1 320px; min-height: 300px; overflow: hidden; border-radius: 18px; border: 1px solid rgba(255,209,102,.3); touch-action: manipulation; }
+    .mu-stage canvas { position: absolute; inset: 0; display: block; width: 100%; height: 100%; }
+    /* Tragaperras ICE QUEEN */
+    .sl-stage { position: relative; width: 100%; aspect-ratio: 1 / .92; min-height: 290px; max-height: 48dvh; overflow: hidden; border-radius: 20px; border: 2px solid rgba(125,249,255,.55); box-shadow: 0 0 24px rgba(89,200,255,.35), inset 0 0 30px rgba(120,200,255,.2); }
+    .sl-stage canvas { position: absolute; inset: 0; display: block; width: 100%; height: 100%; }
+    .sl-ui { margin-top: 10px; padding: 10px; border-radius: 18px; background: linear-gradient(#0b2247, #071530); border: 1px solid rgba(125,249,255,.35); box-shadow: inset 0 0 18px rgba(80,160,255,.15); }
+    .sl-lcds { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
+    @media (min-width: 470px) { .sl-lcds { grid-template-columns: repeat(4, 1fr); } }
+    .sl-lcd { padding: 6px 6px 7px; border-radius: 10px; text-align: center; background: #02070f; border: 1px solid rgba(125,249,255,.35); box-shadow: inset 0 0 10px rgba(0,0,0,.85); }
+    .sl-lcd small { display: block; font: 800 8px/1.1 Inter, sans-serif; letter-spacing: .1em; color: #7fc8ff; }
+    .sl-lcd b { display: block; margin-top: 3px; font: 900 18px/1 "Courier New", monospace; color: #7df9ff; text-shadow: 0 0 8px #3ad6ff; font-variant-numeric: tabular-nums; }
+    .sl-lcd.bk b { color: #63f5ae; text-shadow: 0 0 8px #1fd987; } .sl-lcd.pz b { color: #ffd166; text-shadow: 0 0 8px #ff9d2e; }
+    .sl-lamps { display: flex; justify-content: space-between; gap: 3px; margin-top: 8px; }
+    .sl-lamp { display: flex; flex: 1; max-width: 34px; aspect-ratio: 1; align-items: center; justify-content: center; border-radius: 50%; font: 900 10px/1 Inter, sans-serif; color: #5f7ca0; background: #0a1730; border: 1.5px solid #243b60; }
+    .sl-lamp.on { color: #e8fbff; background: radial-gradient(circle at 35% 30%, #53d8ff, #146aa8); border-color: #9ff3ff; box-shadow: 0 0 8px rgba(125,249,255,.6); }
+    .sl-lamp.win { color: #3a1d00; background: radial-gradient(circle at 35% 30%, #fff6a8, #ff9d2e); border-color: #fff; animation: slBlink .45s ease-in-out infinite alternate; }
+    @keyframes slBlink { from { transform: scale(1); filter: brightness(1); } to { transform: scale(1.2); filter: brightness(1.5); } }
+    .sl-row { display: grid; gap: 8px; margin-top: 8px; }
+    .sl-btn { min-height: 52px; border-radius: 14px; font: 900 12px/1.1 Inter, sans-serif; letter-spacing: .06em; transition: transform .1s, box-shadow .1s, filter .15s; }
+    .sl-btn:disabled { filter: grayscale(.75) brightness(.6); cursor: default; }
+    .sl-lines { color: #dff6ff; background: linear-gradient(#173d78, #0e2650); border: 2px solid rgba(125,249,255,.6); }
+    .sl-lines b { font-size: 16px; color: #7df9ff; }
+    .sl-bet { display: flex; flex-direction: column; justify-content: center; padding: 4px 10px; border-radius: 14px; text-align: center; background: #02070f; border: 1px solid rgba(255,209,102,.4); }
+    .sl-bet small { font: 800 8px/1.2 Inter, sans-serif; letter-spacing: .1em; color: #ffd166; }
+    .sl-bet b { font: 900 18px/1.1 "Courier New", monospace; color: #ffd166; text-shadow: 0 0 8px #ff9d2e; }
+    .sl-bet b small { margin-left: 4px; font-size: 9px; color: #9fb3cc; letter-spacing: 0; text-shadow: none; }
+    .sl-gamble { color: #fff; background: radial-gradient(circle at 35% 25%, #ff8a8a, #e11d2e 55%, #8f0f1b); border: 3px solid #ffd166; box-shadow: 0 4px 0 #5a0a12, 0 0 14px rgba(255,60,80,.45); }
+    .sl-gamble:active:not(:disabled), .sl-spin:active:not(:disabled) { transform: translateY(3px); box-shadow: 0 1px 0 #5a0a12; }
+    .sl-collect { color: #04301c; background: linear-gradient(#7dffb8, #22b573); border: 2px solid #c8ffe2; box-shadow: 0 4px 0 #0e6b43; }
+    .sl-spin { font-size: 17px; color: #03203a; background: linear-gradient(#9ff8ff, #2aa7e8); border: 3px solid #e8fbff; box-shadow: 0 4px 0 #0b5c8f, 0 0 18px rgba(125,249,255,.55); }
+    .sl-msg { display: flex; min-height: 22px; align-items: center; justify-content: center; margin-top: 8px; text-align: center; font-size: 13px; font-weight: 800; color: #e8fbff; }
+    .sl-pay { margin-top: 6px; text-align: center; font-size: 10px; line-height: 1.4; color: #8fb4d8; }
+  
+    /* ===== RULETA · FASE 1: viewport 100dvh bloqueado + escalado sin desbordes (sin lógica de arrastre aún) ===== */
+    html:has(#casino:not(.hidden) #cs-game[data-g="rl"]:not(.hidden)),
+    html:has(#casino:not(.hidden) #cs-game[data-g="rl"]:not(.hidden)) body { overflow: hidden; overscroll-behavior: none; touch-action: none; }
+    #cs-game[data-g="rl"] { --rl-cell: clamp(20px, 4.2dvh, 34px); height: 100vh; height: 100dvh; max-height: 100dvh; width: 100%; overflow: hidden; overscroll-behavior: none; touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+    #cs-game[data-g="rl"] *, #cs-game[data-g="rl"] button { touch-action: none; -webkit-tap-highlight-color: transparent; }
+    #cs-game[data-g="rl"] .cs-top { padding-top: max(4px, env(safe-area-inset-top)); padding-bottom: 4px; }
+    #cs-game[data-g="rl"] .cs-exit, #cs-game[data-g="rl"] .cs-gchips { min-height: 38px; }
+    #cs-game[data-g="rl"] .cs-body { flex: 1 1 0; min-height: 0; overflow: hidden; overscroll-behavior: none; padding: 6px 8px calc(6px + env(safe-area-inset-bottom)); }
+    #cs-game[data-g="rl"] .cs-inner { flex: 1 1 0; min-height: 0; max-width: 560px; height: 100%; }
+    #cs-game[data-g="rl"] #cs-p-rl { display: flex; flex: 1 1 0; min-height: 0; flex-direction: column; }
+    #cs-game[data-g="rl"] .ra { display: flex; flex: 1 1 0; min-height: 0; flex-direction: column; padding: 6px; border-radius: 20px; overflow: hidden; }
+    #cs-game[data-g="rl"] .ra > * { flex: none; }
+    #cs-game[data-g="rl"] .ra-mq { font-size: 11px; padding: 2px 0 5px; }
+    #cs-game[data-g="rl"] .ra-screen { display: flex; flex: 1 1 0; min-height: 0; padding: 5px; border-radius: 14px; overflow: hidden; }
+    #cs-game[data-g="rl"] .ra-screen > .grid { flex: 1 1 auto; min-height: 0; width: 100%; grid-template-rows: minmax(0, 1fr); gap: 6px; }
+    #cs-game[data-g="rl"] .ra-tap { min-height: 0; height: 100%; grid-template-rows: minmax(0, 1fr); grid-template-columns: 26px 1fr 28px; gap: 2px; }
+    #cs-game[data-g="rl"] .ra-tap > div { min-height: 0; gap: 2px; }
+    #cs-game[data-g="rl"] .ra-tap > div > div[style] { height: var(--rl-cell) !important; flex: none; }
+    #cs-game[data-g="rl"] .ra-tap > div > div.flex-1 { min-height: 0; gap: 2px; }
+    #cs-game[data-g="rl"] .ra-tap > div:nth-child(2) > [data-bet="n:0"] { flex: none; height: var(--rl-cell); }
+    #cs-game[data-g="rl"] .ra-nums { flex: 1 1 0; min-height: 0; grid-template-rows: repeat(12, minmax(0, 1fr)); gap: 2px; }
+    #cs-game[data-g="rl"] .ra .cs-cell { min-height: 0; height: 100%; font-size: clamp(10px, 1.9dvh, 13px); line-height: 1; border-radius: 3px; }
+    #cs-game[data-g="rl"] .ra .ra-v { font-size: clamp(8px, 1.4dvh, 10px); }
+    #cs-game[data-g="rl"] .ra-screen > .grid > .flex-col { min-height: 0; height: 100%; justify-content: space-between; gap: 4px; overflow: hidden; }
+    #cs-game[data-g="rl"] .ra-visor { width: min(100%, 21dvh); margin: 0 auto; padding: 4px; }
+    #cs-game[data-g="rl"] .ra-launch { width: min(76px, 10.5dvh); height: min(76px, 10.5dvh); font-size: 10px; border-width: 3px; box-shadow: 0 4px 0 #5a0a12, 0 7px 12px rgba(0,0,0,.5); }
+    #cs-game[data-g="rl"] .ra-strip { padding: 3px 4px; }
+    #cs-game[data-g="rl"] .ra-strip h4 { margin-bottom: 2px; font-size: 8px; }
+    #cs-game[data-g="rl"] .ra-strip .cs-dot { min-width: 15px; height: 15px; font-size: 8px; }
+    #cs-game[data-g="rl"] .ra-sp { min-height: 0; height: clamp(26px, 4.4dvh, 36px); padding: 0 2px; font-size: 8.5px; border-width: 1.5px; box-shadow: 0 2px 0 #6b4400; }
+    #cs-game[data-g="rl"] .ra-sp small { font-size: 7px; }
+    #cs-game[data-g="rl"] .ra > .mt-2 { margin-top: 5px; }
+    #cs-game[data-g="rl"] #cs-p-rl .cs-chip { width: min(44px, 6dvh); height: min(44px, 6dvh); font-size: 11px; }
+    #cs-game[data-g="rl"] #cs-p-rl .btn-juice.min-h-\[48px\] { min-height: 0; height: clamp(34px, 5.4dvh, 44px); }
+    #cs-game[data-g="rl"] #cs-rl-undo { padding: 3px 8px; }
+    #cs-game[data-g="rl"] .ra > p.text-center { font-size: 9px; line-height: 1.2; }
+    @media (max-height: 700px) { #cs-game[data-g="rl"] .ra > p.text-center, #cs-game[data-g="rl"] .ra-mq { display: none; } }
+    @media (max-height: 600px) { #cs-game[data-g="rl"] .ra-strip h4 { display: none; } }
+      /* ===== RULETA · FASE 2: feedback visual de pintadas ===== */
+    @keyframes rlPaint { 0% { transform: scale(1); filter: brightness(1); } 35% { transform: scale(1.18); filter: brightness(1.8); box-shadow: 0 0 10px 2px rgba(255,209,102,.9); } 100% { transform: scale(1); filter: brightness(1); } }
+    #cs-game[data-g="rl"] .cs-cell.rl-paint { animation: rlPaint .28s ease-out; position: relative; z-index: 2; }
+    #cs-game[data-g="rl"] .cs-cell:disabled { opacity: 1; }
   </style>
 </head>
 <body>
@@ -523,7 +620,8 @@
        REGLA ANTI-TRAMPAS: cada jugada se LIQUIDA en el estado y se guarda ANTES de animarse (recargar no devuelve apuestas);
        la animación solo retrasa lo que se ve (cHold = premio oculto hasta que termina la animación).
        Juegos: Ruleta europea (37 casillas), Blackjack (3:2, la banca se planta en 17, doblar), Póker (vídeo póker Jacks or Better),
-       Mus (baraja española, parejas, a 10 piedras) y Tragaperras (RTP 92,5 %). */
+       Mus (baraja española, parejas, a 10 piedras) y Tragaperras ICE QUEEN (5x3, 10 líneas, RTP ≈ 93 %).
+       Fase 2 UI: lobby con tarjetas de juego; cada juego se abre a pantalla completa (#cs-game, 100dvh) con botón Salir arriba a la izquierda. */
     const CASINO_MAX_SPOT = 10000;
     const RL_ORDER = [0, 32, 15, 19, 4, 21, 2, 25, 17, 34, 6, 27, 13, 36, 11, 30, 8, 23, 10, 5, 24, 16, 33, 1, 20, 14, 31, 9, 22, 18, 29, 7, 28, 12, 35, 3, 26];
     const RL_RED = new Set([1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36]);
@@ -544,10 +642,27 @@
       return 0;
     }
     const CS_CHIPS = [{ v: 1, bg: "#cbd5e1", fg: "#0f172a" }, { v: 5, bg: "#ff5d75", fg: "#ffffff" }, { v: 25, bg: "#63f5ae", fg: "#08111f" }, { v: 100, bg: "#59a7ff", fg: "#08111f" }, { v: 500, bg: "#ffd166", fg: "#08111f" }];
-    const SL_SYM = ["🍒", "🍋", "🔔", "💎", "7"], SL_W = [9, 7, 5, 3, 1], SL_PAY = [6, 9, 15, 40, 150]; // 3 iguales; 2 cerezas devuelven la apuesta
-    const slHtml = i => i === 4 ? "<b>7</b>" : SL_SYM[i];
-    const slPick = () => { let r = Math.random() * SL_W.reduce((a, b) => a + b, 0); for (let i = 0; i < SL_W.length; i++) { r -= SL_W[i]; if (r < 0) return i; } return 0; };
-    const slMult = r => r[0] === r[1] && r[1] === r[2] ? SL_PAY[r[0]] : r.filter(x => x === 0).length === 2 ? 1 : 0;
+    /* Tragaperras ICE QUEEN: rejilla 5x3 (índice = columna*3 + fila), 10 líneas, WILD solo en los carretes 2-4 (sustituye a cualquier letra).
+       Símbolos: 0 J rosa · 1 Q morada · 2 A estrellada · 3 WILD helado. RTP teórico ≈ 93 % (enumeración exacta), acierto por línea ≈ 19 %. */
+    const SL_LETTER = ["J", "Q", "A", "WILD"];
+    const SL_W = [[10, 7, 5, 0], [9, 6, 4, 2], [9, 6, 4, 2], [9, 6, 4, 2], [10, 7, 5, 0]]; // pesos [J, Q, A, WILD] de cada carrete
+    const SL_PAY = [[1, 4, 12], [2, 6, 18], [4, 10, 40], [8, 30, 140]]; // × apuesta por línea con 3 / 4 / 5 símbolos seguidos desde la izquierda
+    const SL_LINES = [[1, 1, 1, 1, 1], [0, 0, 0, 0, 0], [2, 2, 2, 2, 2], [0, 1, 2, 1, 0], [2, 1, 0, 1, 2], [0, 0, 1, 2, 2], [2, 2, 1, 0, 0], [1, 0, 0, 0, 1], [1, 2, 2, 2, 1], [1, 0, 1, 2, 1]];
+    const SL_LINE_OPTS = [1, 3, 5, 10], SL_BANK_CAP = 200000;
+    const SL_LCOL = ["#7df9ff", "#ff6ad5", "#ffd166", "#63f5ae", "#b28bff", "#ff9d5c", "#59a7ff", "#ff5d75", "#e4ff6a", "#ffffff"];
+    const slPick = col => { const w = SL_W[col]; let r = Math.random() * (w[0] + w[1] + w[2] + w[3]); for (let i = 0; i < 4; i++) { r -= w[i]; if (r < 0) return i; } return 0; };
+    const slGrid = () => Array.from({ length: 15 }, (_, k) => slPick(Math.floor(k / 3)));
+    /* Evalúa las primeras `lines` líneas: premio en × apuesta por línea. El WILD sustituye a todo y también paga por sí mismo. */
+    function slEval(g, lines) {
+      const wins = []; let mult = 0;
+      for (let L = 0; L < lines; L++) {
+        const s = SL_LINES[L].map((r, c) => g[c * 3 + r]); let lw = 0; while (lw < 5 && s[lw] === 3) lw++;
+        let best = lw >= 3 ? SL_PAY[3][lw - 3] : 0, sym = 3, n = lw; const base = s.find(x => x !== 3);
+        if (base !== undefined) { let k = 0; while (k < 5 && (s[k] === base || s[k] === 3)) k++; if (k >= 3 && SL_PAY[base][k - 3] > best) { best = SL_PAY[base][k - 3]; sym = base; n = k; } }
+        if (best > 0) { wins.push({ line: L, n, sym, pay: best }); mult += best; }
+      }
+      return { mult, wins };
+    }
     const BJ_R = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"], BJ_S = ["♠", "♥", "♦", "♣"];
     const bjCard = () => Math.floor(Math.random() * 52); // mazo infinito: carta = rango (i % 13) y palo (i / 13)
     const bjVal = cards => { let t = 0, a = 0; for (const c of cards) { const r = c % 13; if (r === 0) { a++; t += 11; } else t += r >= 9 ? 10 : r + 1; } while (t > 21 && a > 0) { t -= 10; a--; } return { t, soft: a > 0 }; };
@@ -555,6 +670,11 @@
     const bjBackHtml = (fresh, delay) => `<span class="cs-card cs-back ${fresh ? "pop-in" : ""}" ${fresh ? `style="animation-delay:${delay}ms"` : ""}></span>`;
     let cTab = "rl", cChip = 5, cRef = null, cHold = 0, cBjUntil = 0, cBjSeen = { p: 0, d: 0, hole: false }, cRot = null, cRlMsg = "", cSlMsg = "", cSlTimer = 0; let cVpUntil = 0, cFx = {}, cMuSel = [];
     const cBusy = { rl: false, sl: false };
+    /* Fase 2: cOpen = hay un juego a pantalla completa abierto · cMu* = cola de bocadillos del Mus · cSl* = animaciones de Ice Queen */
+    let cOpen = false, cMuQ = [], cMuCur = null, cMuRaf = 0, cMuShown = [0, 0], cMuWas = false, cSlRaf = 0, cSlAnim = null, cSlGamble = null, cSlShow = { bank: null, prize: null }, cSlWins = null;
+    const CS_TITLES = { rl: "Ruleta de bar", bj: "Blackjack", vp: "Póker", mu: "Mus", sl: "Ice Queen" };
+    function csRR(g, x, y, w, h, r) { r = Math.min(r, w / 2, h / 2); g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); }
+    function csStar(g, x, y, r, fill, rot) { g.save(); g.translate(x, y); g.rotate(rot || 0); g.beginPath(); g.moveTo(0, -r); g.quadraticCurveTo(r * .12, -r * .12, r, 0); g.quadraticCurveTo(r * .12, r * .12, 0, r); g.quadraticCurveTo(-r * .12, r * .12, -r, 0); g.quadraticCurveTo(-r * .12, -r * .12, 0, -r); g.fillStyle = fill; g.fill(); g.restore(); }
     const csShuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
     const cEl = id => document.getElementById(id), csN = v => new Intl.NumberFormat("es-ES").format(v);
     const csShort = v => v >= 10000 ? Math.round(v / 1000) + "k" : v >= 1000 ? (v / 1000).toFixed(1).replace(".0", "") + "k" : String(v);
@@ -570,7 +690,7 @@
     /* Normaliza y repara gameState.casino (partidas antiguas, guardados corruptos, partida nueva tras reiniciar). */
     function casinoEnsure() {
       const c = gameState.casino && typeof gameState.casino === "object" ? gameState.casino : (gameState.casino = { chips: 0, stats: {} });
-      if (cRef !== c) { cRef = c; cHold = 0; cBusy.rl = cBusy.sl = false; cBjUntil = 0; cBjSeen = { p: 0, d: 0, hole: false }; cRlMsg = cSlMsg = ""; cRot = null; clearInterval(cSlTimer); cVpUntil = 0; cFx = {}; cMuSel = []; }
+      if (cRef !== c) { cRef = c; cHold = 0; cBusy.rl = cBusy.sl = false; cBjUntil = 0; cBjSeen = { p: 0, d: 0, hole: false }; cRlMsg = cSlMsg = ""; cRot = null; clearInterval(cSlTimer); cVpUntil = 0; cFx = {}; cMuSel = []; cOpen = false; cMuQ = []; cMuCur = null; cMuShown = [0, 0]; cMuWas = false; cSlAnim = null; cSlGamble = null; cSlShow = { bank: null, prize: null }; cSlWins = null; }
       c.chips = Number.isFinite(c.chips) && c.chips > 0 ? Math.floor(c.chips) : 0;
       if (!c.stats || typeof c.stats !== "object" || Array.isArray(c.stats)) c.stats = {};
       for (const k of ["plays", "wagered", "back", "best"]) if (!Number.isFinite(c.stats[k])) c.stats[k] = 0;
@@ -595,7 +715,11 @@
       if (ok && mu.phase === "bet") { const b = mu.bet; ok = !!b && okIds(b.order, 4) && b.order.length > 0 && ["i", "pend", "prev", "resp", "by"].every(k => Number.isInteger(b[k])) && b.i >= 0 && b.i < b.order.length && (!b.pend || b.order.includes(b.resp)); }
       if (!ok) { if (mu && typeof mu === "object" && mu.phase !== "done" && Number.isInteger(mu.stake) && mu.stake > 0) c.chips += mu.stake; c.mus = null; }
       else if (mu.phase === "done" && !mu.paid) muSettle(c, mu);
-      if (!(c.sl && Array.isArray(c.sl.last) && c.sl.last.length === 3 && c.sl.last.every(x => Number.isInteger(x) && x >= 0 && x < 5))) c.sl = { last: [0, 1, 2] };
+      const sl = c.sl = c.sl && typeof c.sl === "object" && !Array.isArray(c.sl) ? c.sl : {};
+      if (!(Array.isArray(sl.last) && sl.last.length === 15 && sl.last.every(x => Number.isInteger(x) && x >= 0 && x < 4))) sl.last = slGrid();
+      for (const k of ["bank", "pts", "prize"]) sl[k] = Number.isFinite(sl[k]) && sl[k] > 0 ? Math.floor(sl[k]) : 0;
+      if (sl.bank > SL_BANK_CAP) { c.chips += sl.bank - SL_BANK_CAP; sl.bank = SL_BANK_CAP; }
+      if (!SL_LINE_OPTS.includes(sl.lines)) sl.lines = 10;
     }
     /* ---------- UI Ruleta estilo máquina de bar (vertical) ---------- */
     const RL_SP = { zero: ["Juego del cero", [0, 3, 12, 15, 26, 32, 35]], tercio: ["Tercio", [5, 8, 10, 11, 13, 16, 23, 24, 27, 30, 33, 36]], orph: ["Huérfanos", [1, 6, 9, 14, 17, 20, 31, 34]], vec: ["Vecinos", [0, 2, 3, 4, 7, 12, 15, 18, 19, 21, 22, 25, 26, 28, 29, 32, 35]] }; // apuestas especiales = una ficha a pleno en cada número (mismas cuotas que siempre)
@@ -616,7 +740,7 @@
         <div class="mt-2 flex items-center justify-between gap-2 rounded-xl bg-black/40 px-2 py-1.5 text-[11px] text-slate-200"><span id="cs-rl-sum"></span><button data-rl="undo" id="cs-rl-undo" class="rounded-lg border border-white/30 px-2 py-1 text-[10px] font-bold disabled:opacity-40">↶ Deshacer</button></div>
         <div class="mt-2 grid grid-cols-4 gap-2">${chips}</div>
         <div class="mt-2 grid grid-cols-2 gap-2"><button data-rl="again" id="cs-rl-again" class="btn-juice min-h-[48px] rounded-xl bg-gold text-xs font-extrabold text-ink disabled:opacity-40">REPETIR</button><button data-rl="clear" id="cs-rl-clear" class="btn-juice min-h-[48px] rounded-xl bg-danger text-xs font-extrabold text-white disabled:opacity-40">CANCELAR</button></div>
-        <p class="mt-2 text-center text-[10px] text-slate-300">Pleno 35:1 · Docena 2:1 · Resto 1:1 · El 0 pierde las externas · Especiales: 1 ficha en cada número</p></div>`;
+        <p class="mt-2 text-center text-[10px] text-slate-300">Toca o desliza el dedo sobre el tapete para pintar fichas · Pleno 35:1 · Docena 2:1 · Resto 1:1 · El 0 pierde las externas · Especiales: 1 ficha en cada número</p></div>`;
     }
     function rlSpecial(k) {
       casinoEnsure(); const c = gameState.casino, rl = c.rl, S = RL_SP[k]; if (!S || cBusy.rl) return;
@@ -635,13 +759,18 @@
       const out = "border border-white/20 bg-black/30 text-white";
       const nums = Array.from({ length: 36 }, (_, i) => i + 1).map(n => cell("n:" + n, n, RL_RED.has(n) ? "bg-[#c4283f] text-white" : "border border-white/10 bg-[#12161f] text-white")).join("");
       const act = (attr, id, l, cls) => `<button ${attr} id="${id}" class="btn-juice min-h-[48px] rounded-xl px-2 text-xs font-extrabold disabled:cursor-not-allowed disabled:opacity-40 ${cls}">${l}</button>`;
-      root.innerHTML = `<div class="mb-4 flex items-end justify-between gap-3"><div><p class="text-xs font-bold uppercase tracking-[.22em] text-gold">Casino Royale</p><h2 class="mt-1 text-2xl font-black text-white">Mesas de juego</h2></div><div class="text-right"><p class="text-[11px] text-slate-400">Tus fichas</p><b id="cs-chips" class="text-lg text-gold"></b></div></div>
+      const gcard = (id, ic, l, sub, cls) => `<button data-ctab="${id}" class="cs-gcard btn-juice ${cls || ""}"><i class="fa-solid ${ic}"></i><span><b>${l}</b><small>${sub}</small></span></button>`;
+      root.innerHTML = `<div id="cs-lobby"><div class="mb-4 flex items-end justify-between gap-3"><div><p class="text-xs font-bold uppercase tracking-[.22em] text-gold">Casino Royale</p><h2 class="mt-1 text-2xl font-black text-white">Mesas de juego</h2></div><div class="text-right"><p class="text-[11px] text-slate-400">Tus fichas</p><b id="cs-chips" class="text-lg text-gold"></b></div></div>
         <div class="glass mb-3 rounded-2xl p-3"><div class="mb-2 flex items-center justify-between text-xs text-slate-400"><span>Dinero limpio <b id="cs-cash" class="text-neon"></b></span><span>1 ficha = 1 €</span></div>
           <div class="grid grid-cols-4 gap-2">${cx("buy:100", "100 €", "border-gold/50 bg-gold/10 text-gold")}${cx("buy:500", "500 €", "border-gold/50 bg-gold/10 text-gold")}${cx("buy:all", "Todo", "border-gold/50 bg-gold/10 text-gold")}${cx("out:all", "Cobrar", "border-neon/50 bg-neon/10 text-neon")}</div>
           <p class="mt-2 text-[11px] text-slate-500">Cambia euros por fichas o cobra todas tus fichas de vuelta.</p></div>
-        <div class="mb-3 grid grid-cols-5 gap-1.5" role="tablist">${tab("rl", "fa-compact-disc", "Ruleta")}${tab("bj", "fa-diamond", "Blackjack")}${tab("vp", "fa-hand-holding-dollar", "Póker")}${tab("mu", "fa-people-arrows", "Mus")}${tab("sl", "fa-clover", "Tragaperras")}</div>
-        <div id="cs-chipbar" class="glass mb-3 flex items-center justify-between gap-2 rounded-2xl px-3 py-2"><span class="text-xs font-bold text-slate-300">Ficha</span><div class="flex gap-2">${CS_CHIPS.map(k => `<button data-chip="${k.v}" aria-label="Ficha de ${k.v}" class="cs-chip flex h-11 w-11 items-center justify-center rounded-full text-xs font-black" style="background:${k.bg};color:${k.fg}">${k.v}</button>`).join("")}</div></div>
-
+        <p class="mb-2 text-xs font-bold uppercase tracking-[.2em] text-slate-400">Elige un juego</p>
+        <div class="mb-3 grid grid-cols-1 gap-2.5 sm:grid-cols-2">${gcard("rl", "fa-compact-disc", "Ruleta de bar", "Máquina vertical · pleno 35:1")}${gcard("bj", "fa-diamond", "Blackjack", "Paga 3:2 · doblar")}${gcard("vp", "fa-hand-holding-dollar", "Póker", "Jacks or Better · mesa inmersiva")}${gcard("mu", "fa-people-arrows", "Mus", "Baraja española · parejas")}<span class="sm:col-span-2">${gcard("sl", "fa-snowflake", "Tragaperras ICE QUEEN", "5×3 · 10 líneas · WILD helado · doble o nada", "is-ice")}</span></div>
+        <div class="glass mt-4 grid grid-cols-3 gap-2 rounded-2xl p-3 text-center"><div><p class="text-[11px] text-slate-400">Balance neto</p><b id="cs-st-net" class="text-sm"></b></div><div><p class="text-[11px] text-slate-400">Mayor premio</p><b id="cs-st-best" class="text-sm text-gold"></b></div><div><p class="text-[11px] text-slate-400">Jugadas</p><b id="cs-st-plays" class="text-sm text-white"></b></div></div>
+        <p class="mt-3 text-center text-[11px] text-slate-500">Dinero virtual: la casa siempre tiene ventaja, juega con cabeza.</p></div>
+        <div id="cs-game" class="hidden" data-g="rl"><div class="cs-top"><button data-cexit class="cs-exit btn-juice" aria-label="Salir del juego"><i class="fa-solid fa-arrow-left"></i><span>Salir</span></button><p id="cs-gtitle" class="cs-gtitle"></p><div class="cs-gchips"><i class="fa-solid fa-coins"></i><b id="cs-chips-g"></b></div></div>
+        <div id="cs-body" class="cs-body"><div class="cs-inner">
+        <div id="cs-chipbar"><span id="cs-chip-lbl" class="text-xs font-bold text-slate-300">Ficha</span><div class="flex gap-2">${CS_CHIPS.map(k => `<button data-chip="${k.v}" aria-label="Ficha de ${k.v}" class="cs-chip flex h-11 w-11 items-center justify-center rounded-full text-xs font-black" style="background:${k.bg};color:${k.fg}">${k.v}</button>`).join("")}</div></div>
         <div id="cs-p-rl">${rlPanel(cell, W)}</div>
 
         <div id="cs-p-bj" class="hidden"><div class="cs-felt rounded-2xl p-4"><p id="cs-bj-dl" class="min-h-[16px] text-xs font-bold text-slate-200"></p><div id="cs-bj-d" class="mt-2 flex min-h-[68px] flex-wrap gap-2"></div>
@@ -654,24 +783,30 @@
           <div id="cs-vp-pay" class="glass mt-3 grid gap-1 rounded-2xl p-3 text-xs text-slate-200">${VP_PAY.map(r => `<div data-vprow="${r[0]}" class="flex items-center justify-between rounded-lg px-2 py-1"><span>${r[1]}</span><b class="text-gold">×${r[2]}</b></div>`).join("")}</div>
           <p class="mt-3 text-center text-[11px] text-slate-400">Vídeo póker «Jacks or Better»: reparte 5 cartas, retén las que quieras y cambia el resto una vez. Tabla 8/5 (≈96 % con estrategia óptima).</p></div>
 
-        <div id="cs-p-mu" class="hidden"><div class="cs-felt rounded-2xl p-3"><div class="mb-3 flex items-center justify-between text-xs font-bold text-slate-100"><span id="cs-mu-score"></span><span id="cs-mu-stake" class="text-gold"></span></div>
-          <div id="cs-mu-seats" class="grid grid-cols-3 gap-2 text-center"></div><p id="cs-mu-info" class="my-3 min-h-[20px] text-center text-sm font-bold text-white"></p>
+        <div id="cs-p-mu" class="hidden"><div class="mu-hud"><span id="cs-mu-score"></span><span id="cs-mu-stake" class="text-gold"></span></div>
+          <div class="mu-stage"><canvas id="cs-mu-cv" aria-label="Mesa de mus"></canvas></div>
+          <p id="cs-mu-info" class="my-2 min-h-[20px] text-center text-sm font-bold text-white"></p>
           <div id="cs-mu-hand" class="flex justify-center gap-2"></div><p id="cs-mu-hint" class="mt-2 text-center text-[11px] text-slate-200"></p>
-          <div id="cs-mu-log" class="mt-3 max-h-28 overflow-y-auto rounded-xl bg-black/25 p-2 text-[11px] leading-4 text-slate-200"></div></div>
           <div id="cs-mu-ctl" class="mt-3"></div>
-          <p class="mt-3 text-center text-[11px] text-slate-400">Baraja española de 40 cartas (sin 8 ni 9): oros, copas, espadas y bastos. Mus a ${MUS_TARGET} piedras: tú y tu compañero (IA) contra dos rivales (IA). Lances: Grande, Chica, Pares y Juego/Punto. S = sota, C = caballo, R = rey; los 3 son reyes y los 2 ases. Si ganáis cobras ×${MUS_PAYOUT}. Reglas simplificadas: sin señas, el envite sube de 2 en 2 y el órdago decide la partida.</p></div>
-
-        <div id="cs-p-sl" class="hidden"><div class="cs-felt rounded-2xl p-4 text-center"><div class="mx-auto flex w-fit gap-2 rounded-2xl border-2 border-gold/50 bg-black/40 p-3">${[0, 1, 2].map(i => `<div id="cs-reel-${i}" class="cs-reel"></div>`).join("")}</div>
-          <p id="cs-sl-msg" class="mt-3 flex min-h-[24px] items-center justify-center gap-1 text-sm font-bold text-white"></p>
-          <button data-sl="spin" id="cs-sl-btn" class="btn-juice mt-3 min-h-[52px] w-full rounded-xl bg-gold px-4 text-sm font-extrabold text-ink disabled:cursor-not-allowed disabled:opacity-40"></button>
-          <div class="mt-4 grid grid-cols-2 gap-1.5 text-left text-xs text-slate-200">${[4, 3, 2, 1, 0].map(i => `<span class="flex items-center justify-between rounded-lg bg-black/25 px-2 py-1.5"><span>${i === 4 ? "<b class=\"text-danger\">777</b>" : slHtml(i).repeat(3)}</span><b class="text-gold">×${SL_PAY[i]}</b></span>`).join("")}<span class="col-span-2 flex items-center justify-between rounded-lg bg-black/25 px-2 py-1.5"><span>🍒🍒 en cualquier posición</span><b class="text-gold">recuperas</b></span></div></div></div>
-
-        <div class="glass mt-4 grid grid-cols-3 gap-2 rounded-2xl p-3 text-center"><div><p class="text-[11px] text-slate-400">Balance neto</p><b id="cs-st-net" class="text-sm"></b></div><div><p class="text-[11px] text-slate-400">Mayor premio</p><b id="cs-st-best" class="text-sm text-gold"></b></div><div><p class="text-[11px] text-slate-400">Jugadas</p><b id="cs-st-plays" class="text-sm text-white"></b></div></div>
-        <p class="mt-3 text-center text-[11px] text-slate-500">Dinero virtual: la casa siempre tiene ventaja, juega con cabeza.</p>`;
+          <p class="mt-3 text-center text-[11px] text-slate-400">Baraja española de 40 cartas (sin 8 ni 9): oros, copas, espadas y bastos. Mus a ${MUS_TARGET} piedras: tú y tu compañero (IA) contra dos rivales (IA). Lances: Grande, Chica, Pares y Juego/Punto. S = sota, C = caballo, R = rey; los 3 son reyes y los 2 ases. Si ganáis cobras ×${MUS_PAYOUT}. Reglas simplificadas: sin señas, el envite sube de 2 en 2 y el órdago decide la partida. Toca la mesa para saltar un bocadillo.</p></div>
+        <div id="cs-p-sl" class="hidden"><div class="sl-stage"><canvas id="cs-sl-cv" aria-label="Tragaperras Ice Queen"></canvas></div>
+          <div class="sl-ui">
+            <div class="sl-lcds"><div class="sl-lcd"><small>CRÉDITOS</small><b id="sl-cred">0</b></div><div class="sl-lcd bk"><small>BANCO</small><b id="sl-bank">0</b></div><div class="sl-lcd"><small>PUNTOS</small><b id="sl-pts">0</b></div><div class="sl-lcd pz"><small>PREMIO PARTIDA</small><b id="sl-prize">0</b></div></div>
+            <div id="sl-lamps" class="sl-lamps" aria-label="Indicadores de líneas">${Array.from({ length: 10 }, (_, i) => `<span class="sl-lamp" data-lamp="${i}">${i + 1}</span>`).join("")}</div>
+            <div class="sl-row" style="grid-template-columns:1fr 1.2fr"><button data-sl="lines" id="sl-lines" class="sl-btn sl-lines"></button><div class="sl-bet"><small>APUESTA TOTAL</small><b id="sl-bet">0</b></div></div>
+            <div class="sl-row" style="grid-template-columns:1.15fr .95fr 1.25fr"><button data-sl="gamble" id="sl-gamble" class="sl-btn sl-gamble">DOBLE<br>O NADA</button><button data-sl="collect" id="sl-collect" class="sl-btn sl-collect">COBRAR<br>BANCO</button><button data-sl="spin" id="sl-spin" class="sl-btn sl-spin">GIRAR</button></div>
+            <p id="cs-sl-msg" class="sl-msg"></p>
+            <p class="sl-pay">${SL_LETTER.map((n, i) => `${n} ×${SL_PAY[i].join("·")}`).join(" · ")} (3·4·5 seguidos, por línea). WILD sustituye en los carretes 2-4. Doble o nada: 50 % sobre el último premio.</p>
+          </div></div>
+        </div></div></div>`;
+      cEl("cs-mu-cv").addEventListener("pointerdown", muSkip);
+      rlPaintInit();
+      if (!window.__csKeys) { window.__csKeys = 1; document.addEventListener("keydown", e => { if (e.key === "Escape" && cOpen && !cEl("casino").classList.contains("hidden")) casinoExit(); }); window.addEventListener("resize", () => muKick()); document.addEventListener("touchmove", e => { if (cOpen && cTab === "rl" && !cEl("casino").classList.contains("hidden")) e.preventDefault(); }, { passive: false }); }
       root.addEventListener("click", e => {
         const g = s => e.target.closest(s); let t;
-        if ((t = g("[data-cx]"))) casinoCash(t.dataset.cx);
-        else if ((t = g("[data-ctab]"))) { cTab = t.dataset.ctab; casinoUI(); }
+        if (g("[data-cexit]")) casinoExit();
+        else if ((t = g("[data-cx]"))) casinoCash(t.dataset.cx);
+        else if ((t = g("[data-ctab]"))) { cTab = t.dataset.ctab; cOpen = true; casinoUI(); cEl("cs-body").scrollTop = 0; }
         else if ((t = g("[data-chip]"))) { cChip = +t.dataset.chip; beep(500, .04, "triangle", .03); casinoUI(); }
         else if ((t = g("[data-bet]"))) rlBet(t.dataset.bet);
         else if ((t = g("[data-sp]"))) rlSpecial(t.dataset.sp);
@@ -679,11 +814,11 @@
         else if ((t = g("[data-bj]"))) bjAct(t.dataset.bj);
         else if ((t = g("[data-vp]"))) vpAct(t.dataset.vp);
         else if ((t = g("[data-mu]"))) muAct(t.dataset.mu);
-        else if (g("[data-sl]")) slSpin();
+        else if ((t = g("[data-sl]"))) slAct(t.dataset.sl);
       });
     }
     function casinoCash(a) {
-      casinoEnsure(); const c = gameState.casino, [side, q] = a.split(":");
+      casinoEnsure(); slCollect(true); const c = gameState.casino, [side, q] = a.split(":");
       if (cBusy.rl || cBusy.sl || cHold > 0) return showToast("Mesa en juego", "Espera a que termine la jugada para cambiar fichas.", "electric");
       if (side === "out") {
         if (c.chips < 1) return showToast("Sin fichas", "No tienes fichas que cobrar.", "danger");
@@ -696,19 +831,23 @@
       }
       render(); save(); casinoUI();
     }
+    function casinoExit() { cOpen = false; casinoEnsure(); slCollect(true); casinoUI(); }
     function casinoUI() {
       const root = cEl("casino"); if (!root.dataset.built || root.classList.contains("hidden")) return; casinoEnsure();
+      if (!cOpen) slCollect(true); // al volver al lobby, el banco de la tragaperras regresa a tus fichas
       const c = gameState.casino, busy = cBusy.rl || cBusy.sl || cHold > 0, st = c.stats, net = st.back - st.wagered;
-      cEl("cs-chips").textContent = csN(c.chips - cHold); cEl("cs-cash").textContent = moneyFormat(r2(gameState.cleanMoney));
+      cEl("cs-chips").textContent = csN(c.chips - cHold); cEl("cs-chips-g").textContent = csN(c.chips - cHold); cEl("cs-cash").textContent = moneyFormat(r2(gameState.cleanMoney));
       root.querySelectorAll("[data-cx]").forEach(b => { const [s, q] = b.dataset.cx.split(":"), ok = !busy && (s === "out" ? c.chips >= 1 : q === "all" ? gameState.cleanMoney >= 1 : gameState.cleanMoney >= +q); b.classList.toggle("opacity-40", !ok); b.setAttribute("aria-disabled", String(!ok)); });
-      root.querySelectorAll("[data-ctab]").forEach(b => { const on = b.dataset.ctab === cTab; b.classList.toggle("is-on", on); b.setAttribute("aria-selected", String(on)); });
+      cEl("cs-lobby").classList.toggle("hidden", cOpen); cEl("cs-game").classList.toggle("hidden", !cOpen);
+      cEl("cs-game").dataset.g = cTab; cEl("cs-gtitle").textContent = CS_TITLES[cTab] || "";
       ["rl", "bj", "vp", "mu", "sl"].forEach(k => cEl("cs-p-" + k).classList.toggle("hidden", k !== cTab));
       if (cTab === "rl" ? !RL_CHIPS.some(k => k.v === cChip) : !CS_CHIPS.some(k => k.v === cChip)) cChip = cTab === "rl" ? 20 : 5;
-      cEl("cs-chipbar").classList.toggle("hidden", cTab === "rl");
+      cEl("cs-chipbar").classList.toggle("hidden", cTab === "rl"); cEl("cs-chip-lbl").textContent = cTab === "sl" ? "Por línea" : "Ficha";
       root.querySelectorAll("[data-chip]").forEach(b => b.classList.toggle("is-sel", +b.dataset.chip === cChip));
       const nEl = cEl("cs-st-net"); nEl.textContent = (net >= 0 ? "+" : "−") + csN(Math.abs(net)); nEl.className = "text-sm " + (net >= 0 ? "text-neon" : "text-danger");
       cEl("cs-st-best").textContent = csN(st.best); cEl("cs-st-plays").textContent = csN(st.plays);
-      ({ rl: rlUI, bj: bjUI, vp: vpUI, mu: muUI, sl: slUI })[cTab]();
+      if (!(cOpen && cTab === "mu")) muFlush(); // si sales de la mesa de Mus, los bocadillos pendientes se descartan (la partida ya está liquidada)
+      if (cOpen) ({ rl: rlUI, bj: bjUI, vp: vpUI, mu: muUI, sl: slUI })[cTab]();
     }
 
     /* ---------- Ruleta ---------- */
@@ -744,11 +883,63 @@
       document.querySelectorAll("#cs-p-rl [data-sp]").forEach(b => b.disabled = busy); cEl("cs-rl-undo").disabled = busy || !rl.stack.length; cEl("cs-rl-clear").disabled = busy || !tot; cEl("cs-rl-again").disabled = busy || !csSum(rl.last); cEl("cs-rl-spin").disabled = busy || !tot;
       if (!busy) { if (cRot === null) cRot = hist.length ? -RL_ORDER.indexOf(hist[0]) * Math.PI * 2 / 37 : 0; rlDraw(cRot, -Math.PI / 2, hist.length ? "pocket" : undefined); }
     }
+    /* Coloca UNA ficha sin tocar la UI. Devuelve "ok" | "busy" | "chips" | "max". grp agrupa las fichas de un mismo trazo para que "Deshacer" quite el trazo entero. */
+    function rlPlace(key, grp) {
+      casinoEnsure(); const c = gameState.casino, rl = c.rl; if (cBusy.rl || !RL_KEY.test(key)) return "busy";
+      if (c.chips < cChip) return "chips";
+      if ((rl.bets[key] || 0) + cChip > CASINO_MAX_SPOT) return "max";
+      c.chips -= cChip; rl.bets[key] = (rl.bets[key] || 0) + cChip; rl.stack.push(grp ? [key, cChip, grp] : [key, cChip]); cRlMsg = ""; return "ok";
+    }
+    const rlWarn = r => { if (r === "chips") showToast("Fichas insuficientes", "Cambia dinero por fichas arriba o elige una ficha menor.", "danger"); else if (r === "max") showToast("Límite de mesa", `Máximo ${csN(CASINO_MAX_SPOT)} fichas por casilla.`, "electric"); };
     function rlBet(key) {
-      casinoEnsure(); const c = gameState.casino, rl = c.rl; if (cBusy.rl || !RL_KEY.test(key)) return;
-      if (c.chips < cChip) return showToast("Fichas insuficientes", "Cambia dinero por fichas arriba o elige una ficha menor.", "danger");
-      if ((rl.bets[key] || 0) + cChip > CASINO_MAX_SPOT) return showToast("Límite de mesa", `Máximo ${csN(CASINO_MAX_SPOT)} fichas por casilla.`, "electric");
-      c.chips -= cChip; rl.bets[key] = (rl.bets[key] || 0) + cChip; rl.stack.push([key, cChip]); cRlMsg = ""; beep(700, .04, "triangle", .03); save(); casinoUI();
+      const r = rlPlace(key); if (r !== "ok") return rlWarn(r);
+      beep(700, .04, "triangle", .03); save(); casinoUI();
+    }
+    /* ---------- FASE 2: pintadas (slide-to-bet) ----------
+       Tocar = 1 ficha. Deslizar = 1 ficha por casilla nueva que cruce el dedo (el trazo se interpola para no saltar casillas).
+       Antispam: (a) una casilla no recibe otra ficha hasta que el dedo sale de ella y entra otra; (b) tras pintar una casilla, no se repinta en RL_PAINT_GAP ms
+       (tocar de nuevo con un tap explícito sí apila). La UI se refresca ligera durante el trazo y completa + guarda al soltar. */
+    const RL_PAINT_GAP = 600, rlLastHit = {};
+    function rlLive(key, b) {
+      const c = gameState.casino, rl = c.rl, v = rl.bets[key] || 0, bd = b.lastElementChild, tot = csSum(rl.bets);
+      bd.textContent = csShort(v); bd.classList.toggle("hidden", !v);
+      cEl("cs-rl-sum").innerHTML = `Apostado <b class="text-gold">${csN(tot)}</b> · Libres <b class="text-white">${csN(c.chips - cHold)}</b>`;
+      cEl("cs-chips-g").textContent = csN(c.chips - cHold); cEl("cs-chips").textContent = csN(c.chips - cHold);
+      cEl("cs-rl-undo").disabled = false; cEl("cs-rl-clear").disabled = false; cEl("cs-rl-spin").disabled = false;
+    }
+    function rlPaintInit() {
+      const tap = document.querySelector("#cs-p-rl .ra-tap"); if (!tap || tap.dataset.paint) return; tap.dataset.paint = "1";
+      let st = null;
+      const active = () => cOpen && cTab === "rl" && !cBusy.rl;
+      const cellAt = (x, y) => { const el = document.elementFromPoint(x, y), b = el && el.closest ? el.closest("[data-bet]") : null; return b && tap.contains(b) ? b : null; };
+      const hit = (b, now, force) => {
+        if (!st || st.stop || !b) return;
+        const key = b.dataset.bet; if (key === st.cur) return; st.cur = key;       // (a) misma casilla: nada
+        if (!force && now - (rlLastHit[key] || -1e9) < RL_PAINT_GAP) return;       // (b) enfriamiento temporal
+        const r = rlPlace(key, st.grp);
+        if (r === "ok") {
+          rlLastHit[key] = now; st.n++; rlLive(key, b);
+          b.classList.remove("rl-paint"); void b.offsetWidth; b.classList.add("rl-paint");
+          if (now - st.snd > 55) { st.snd = now; beep(700, .03, "triangle", .025); }
+          if (navigator.vibrate) navigator.vibrate(5);
+        } else if (r === "chips") { st.stop = true; rlWarn(r); }
+        else if (r === "max" && !st.warned) { st.warned = true; rlWarn(r); }
+      };
+      const mine = e => st && Array.from(e.changedTouches).find(t => t.identifier === st.id);
+      tap.addEventListener("touchstart", e => {
+        if (!active()) return; e.preventDefault();                                  // evita el click sintético (si no, la 1ª ficha se pondría doble)
+        if (st) return; const t = e.changedTouches[0], now = performance.now();
+        st = { id: t.identifier, grp: "p" + Date.now(), cur: null, n: 0, snd: 0, stop: false, warned: false, px: { x: t.clientX, y: t.clientY } };
+        hit(cellAt(t.clientX, t.clientY), now, true);
+      }, { passive: false });
+      tap.addEventListener("touchmove", e => {
+        const t = mine(e); if (!t) return; e.preventDefault();
+        const dx = t.clientX - st.px.x, dy = t.clientY - st.px.y, n = Math.min(40, Math.max(1, Math.ceil(Math.hypot(dx, dy) / 6))), now = performance.now();
+        for (let i = 1; i <= n; i++) hit(cellAt(st.px.x + dx * i / n, st.px.y + dy * i / n), now);
+        st.px = { x: t.clientX, y: t.clientY };
+      }, { passive: false });
+      const end = e => { if (!mine(e)) return; if (e.cancelable) e.preventDefault(); const n = st.n; st = null; if (n) { save(); casinoUI(); } };
+      tap.addEventListener("touchend", end, { passive: false }); tap.addEventListener("touchcancel", end, { passive: false });
     }
     function rlAct(a) {
       casinoEnsure(); const c = gameState.casino, rl = c.rl; if (cBusy.rl) return;
@@ -958,7 +1149,6 @@
     const muKeyPares = p => p ? p.t * 169 + p.a * 13 + p.b : -1;
     const muPairName = p => !p ? "sin pares" : p.t === 1 ? "pareja" : p.t === 2 ? "medias" : "duples";
     const muHint = h => `Pares: ${muPairName(muPares(h))} · Cuenta: ${muSum(h)}${muSum(h) >= 31 ? " (juego)" : " (punto)"}`;
-    function muLog(m, t) { m.log.push(t); if (m.log.length > 16) m.log.shift(); }
     /* Fuerza de una mano en un lance = percentil frente a manos al azar que juegan ese lance (0 = peor, 1 = mejor). */
     let muDist = null;
     function muStrength(h, L, punto) {
@@ -1070,9 +1260,10 @@
     function muAct(a) {
       casinoEnsure(); const c = gameState.casino; let m = c.mus;
       if (a === "plus" || a === "minus") { if (m && m.phase !== "done") return; c.musBet = Math.max(1, Math.min(CASINO_MAX_SPOT, Math.max(1, c.chips), c.musBet + (a === "plus" ? cChip : -cChip))); save(); return casinoUI(); }
+      if (muBusy() && a !== "quit") return; // la mesa está hablando: espera al final de los bocadillos
       if (a === "start") {
         if (m && m.phase !== "done") return; const bet = c.musBet; if (c.chips < bet) return showToast("Fichas insuficientes", "Baja la apuesta o cambia más dinero por fichas.", "danger");
-        c.chips -= bet; m = c.mus = muNew(bet); cMuSel = []; beep(500, .06, "triangle", .04); muAdvance(m); save(); return casinoUI();
+        c.chips -= bet; m = c.mus = muNew(bet); cMuSel = []; cMuShown = [0, 0]; beep(500, .06, "triangle", .04); muAdvance(m); const net0 = muSettle(c, m), fx0 = muPayFx(net0, m); save(); casinoUI(); return fx0 && fx0();
       }
       if (!m || m.phase === "done") return;
       const b = m.bet; let toast = null;
@@ -1093,7 +1284,7 @@
       else if (a === "next" && m.phase === "next") { muLanceStart(m); muAdvance(m); }
       else if (a === "hand" && m.phase === "hand") { m.mano = (m.mano + 1) % 4; muDeal(m); muAdvance(m); }
       else return;
-      const net = muSettle(c, m); beep(560, .05, "triangle", .03); save(); casinoUI(); if (net !== null) csFx(net, m.stake, "Mus");
+      const net = muSettle(c, m), fx = muPayFx(net, m); beep(560, .05, "triangle", .03); save(); casinoUI(); if (fx) fx();
     }
     const MU_SV = ['<circle cx="12" cy="12" r="10.5" fill="#f4b81b" stroke="#8a5a00" stroke-width="1.6"/><circle cx="12" cy="12" r="6.3" fill="none" stroke="#9a6a00" stroke-width="1.2"/><circle cx="12" cy="12" r="2.4" fill="#9a6a00"/>',
       '<path d="M4.5 3h15c0 7-2.6 10.5-7.5 10.5S4.5 10 4.5 3z" fill="#d1304a" stroke="#7a1022" stroke-width="1.4"/><path d="M11 13.5h2v5h-2z" fill="#b8860b"/><path d="M6.5 22l1.5-3.5h8l1.5 3.5z" fill="#b8860b" stroke="#6b4400" stroke-width="1"/>',
@@ -1103,19 +1294,117 @@
     const muFace = (n, s, sm) => `<span class="mu-c" style="color:${MUS_SUITC[s]}">${MUS_LBL[n]}</span>` + (n >= 10 ? `<span class="mu-fig">${muSvg(s, sm ? 17 : 26)}<b>${{ 10: "Sota", 11: "Caballo", 12: "Rey" }[n]}</b></span>` : `<span class="mu-pips">${muSvg(s, sm ? 8 : 11).repeat(n)}</span>`);
     const muCardHtml = (id, o = {}) => { const n = MUS_N[id % 10], s = Math.floor(id / 10), inner = muFace(n, s, o.sm), cls = `cs-card cs-es ${o.sm ? "cs-sm" : ""} ${o.drop ? "cs-drop" : ""}`;
       return o.btn ? `<div class="flex flex-col items-center gap-1"><button data-mu="c:${o.i}" aria-pressed="${!!o.drop}" aria-label="Carta ${MUS_LBL[n]} de ${["oros", "copas", "espadas", "bastos"][s]}" class="${cls}">${inner}</button><span class="text-[10px] font-bold text-danger" style="visibility:${o.drop ? "visible" : "hidden"}">Descartar</span></div>` : `<span class="${cls}">${inner}</span>`; };
+    /* ---------- Mus dinámico: bocadillos de cómic en el canvas ----------
+       La partida se liquida de golpe en el estado (anti-trampas) y cada frase se encola con muLog; aquí solo se REPRODUCE con ritmo:
+       un bocadillo por turno junto al jugador que habla. Mientras suena la cola los botones esperan y las cartas rivales no se enseñan.
+       Tocar la mesa salta el bocadillo en curso. */
+    const MU_EMO = ["😎", "🧔", "😄", "👴"], muImgs = [];
+    const muBusy = () => !!cMuCur || cMuQ.length > 0;
+    function muQ(e) { cMuQ.push(e); if (cMuQ.length > 90) cMuQ.splice(0, cMuQ.length - 90); muKick(); }
+    function muFlush() { if (!cMuQ.length && !cMuCur) return; const q = cMuQ; cMuQ = []; cMuCur = null; cMuWas = false; q.forEach(e => e.fn && e.fn()); }
+    function muSpeech(s) { // texto del registro → [bocadillo, grande?, duración]
+      if (s === "mus") return ["¡Mus!"]; if (s === "no hay mus") return ["¡Corto!"]; if (s === "paso") return ["Paso"];
+      if (s.startsWith("paso,")) return ["Paso… ¡decide tú!"]; if (s === "envido 2") return ["¡Envido!"]; if (/^subo a \d+/.test(s)) return ["¡Envido 2 más!"];
+      if (s === "¡ÓRDAGO!") return ["¡ÓRDAGO!", 1, 1300]; if (s === "quiero") return ["¡Quiero!"]; if (s === "no quiero") return ["No quiero"];
+      const d = s.match(/^descarta (\d)/); if (d) return ["Descarto " + d[1], 0, 650]; return [s];
+    }
+    function muLog(m, t) {
+      m.log.push(t); if (m.log.length > 16) m.log.shift(); // el log sigue en el estado (guardado), pero ya no se pinta como lista
+      if (t.charAt(0) === "—") return; // cabecera de mano
+      const sp = MUS_SEAT.findIndex(n => t.startsWith(n + ": ") || t.startsWith(n + " descarta"));
+      if (sp < 0) return muQ({ sys: 1, text: t }); // lances, resultados, fin de mano → rótulo central
+      const [text, big, dur] = muSpeech(t.slice(MUS_SEAT[sp].length).replace(/^:\s*/, "").trim()); muQ({ seat: sp, text, big, dur });
+    }
+    function muPayFx(net, m) { // el cobro y el aviso esperan a que termine de hablar la mesa; devuelve lo que hay que ejecutar tras pintar
+      if (net === null) return null; const back = m.back, stake = m.stake, show = () => csFx(net, stake, "Mus");
+      if (!muBusy()) return show; cHold += back; muQ({ fn: () => { cHold = Math.max(0, cHold - back); casinoUI(); show(); } }); return null;
+    }
+    function muLoopOn() { return cOpen && cTab === "mu" && !cEl("casino").classList.contains("hidden"); }
+    function muKick() { if (!cMuRaf && muLoopOn()) cMuRaf = requestAnimationFrame(muFrame); }
+    function muSkip() { if (cMuCur) cMuCur.t0 = -1e9; }
+    function muFrame(now) {
+      cMuRaf = 0; if (!muLoopOn()) return;
+      if (cMuCur && now - cMuCur.t0 >= cMuCur.dur) cMuCur = null;
+      while (!cMuCur && cMuQ.length) {
+        const e = cMuQ.shift(); if (e.fn) { e.fn(); continue; }
+        cMuCur = Object.assign({}, e, { t0: now, dur: (e.dur || (e.sys ? 1500 : e.seat === 0 ? 700 : 950)) * (cMuQ.length > 8 ? .7 : 1) }); cMuWas = true;
+        if (!e.sys) beep(e.big ? 200 : 480 + e.seat * 70, .06, e.big ? "sawtooth" : "triangle", .03);
+      }
+      muDraw(now);
+      if (muBusy()) { if (!cMuRaf) cMuRaf = requestAnimationFrame(muFrame); }
+      else if (cMuWas) { cMuWas = false; casinoUI(); } // terminó la conversación: aparecen los botones, el marcador y las cartas
+    }
+    function muSuitImg(s) {
+      if (!muImgs[s]) { const im = new Image(); im.onload = () => muKick(); im.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="64" height="64">${MU_SV[s]}</svg>`); muImgs[s] = im; }
+      return muImgs[s];
+    }
+    function muCardC(g, x, y, w, h, id, face) {
+      csRR(g, x, y, w, h, 3);
+      if (!face) { g.fillStyle = "#8b1c2c"; g.fill(); g.save(); g.clip(); g.strokeStyle = "#d4a72c"; g.lineWidth = 1.4; for (let k = -h; k < w; k += 6) { g.beginPath(); g.moveTo(x + k, y + h); g.lineTo(x + k + h, y); g.stroke(); } g.restore(); csRR(g, x, y, w, h, 3); g.lineWidth = 1.6; g.strokeStyle = "#fff4d6"; g.stroke(); return; }
+      const n = MUS_N[id % 10], s = Math.floor(id / 10); g.fillStyle = "#fff4d6"; g.fill(); g.lineWidth = 1.2; g.strokeStyle = "#d9b45a"; g.stroke();
+      g.fillStyle = MUS_SUITC[s]; g.font = `900 ${Math.round(w * .4)}px Inter, sans-serif`; g.textAlign = "left"; g.textBaseline = "top"; g.fillText(MUS_LBL[n], x + 2, y + 1.5);
+      const im = muSuitImg(s), sz = w * .64; if (im.complete && im.naturalWidth) g.drawImage(im, x + (w - sz) / 2, y + h * .4, sz, sz);
+    }
+    /* Globo de cómic: nace desde la punta de la cola (rebote), flota un poco y se desvanece. dir = hacia dónde está el globo respecto al jugador. */
+    function muBubble(g, W, H, ax, ay, dir, text, age, dur, big) {
+      const pin = Math.min(1, age / 220), al = Math.max(0, Math.min(1, (dur - age) / 220)), ease = 1 + 2.70158 * Math.pow(pin - 1, 3) + 1.70158 * Math.pow(pin - 1, 2);
+      const fs = big ? 17 : 14; g.font = `900 ${fs}px Inter, sans-serif`; const bw = g.measureText(text).width + 26, bh = fs + 18, rad = 12, shake = big && age < 450 ? Math.sin(age / 28) * 2.5 : 0;
+      let bx, by, tx, ty, side;
+      if (dir === "r") { tx = ax + 24; ty = ay; bx = tx + 14; by = ay - bh / 2; side = "l"; } else if (dir === "l") { tx = ax - 24; ty = ay; bx = tx - 14 - bw; by = ay - bh / 2; side = "r"; }
+      else if (dir === "u") { tx = ax; ty = ay - 26; bx = ax - bw / 2; by = ty - 12 - bh; side = "b"; } else { tx = ax; ty = ay + 26; bx = ax - bw / 2; by = ty + 12; side = "t"; }
+      bx = Math.max(6, Math.min(W - bw - 6, bx)); by = Math.max(4, Math.min(H - bh - 4, by));
+      const cl = (v, a, b) => Math.max(a, Math.min(b, v)), cy = cl(ty, by + rad + 6, by + bh - rad - 6), cx = cl(tx, bx + rad + 6, bx + bw - rad - 6);
+      g.save(); g.globalAlpha = al; g.translate(tx + shake, ty - 5 * (age / dur)); g.scale(ease, ease); g.translate(-tx, -ty);
+      g.beginPath(); g.moveTo(bx + rad, by);
+      if (side === "t") { g.lineTo(cx - 6, by); g.lineTo(tx, ty); g.lineTo(cx + 6, by); }
+      g.lineTo(bx + bw - rad, by); g.arcTo(bx + bw, by, bx + bw, by + rad, rad);
+      if (side === "r") { g.lineTo(bx + bw, cy - 6); g.lineTo(tx, ty); g.lineTo(bx + bw, cy + 6); }
+      g.lineTo(bx + bw, by + bh - rad); g.arcTo(bx + bw, by + bh, bx + bw - rad, by + bh, rad);
+      if (side === "b") { g.lineTo(cx + 6, by + bh); g.lineTo(tx, ty); g.lineTo(cx - 6, by + bh); }
+      g.lineTo(bx + rad, by + bh); g.arcTo(bx, by + bh, bx, by + bh - rad, rad);
+      if (side === "l") { g.lineTo(bx, cy + 6); g.lineTo(tx, ty); g.lineTo(bx, cy - 6); }
+      g.lineTo(bx, by + rad); g.arcTo(bx, by, bx + rad, by, rad); g.closePath();
+      g.shadowColor = "rgba(0,0,0,.45)"; g.shadowBlur = 8; g.shadowOffsetY = 3; g.fillStyle = big ? "#ff3b4e" : "#fffef6"; g.fill(); g.shadowColor = "transparent";
+      g.lineWidth = 3; g.lineJoin = "round"; g.strokeStyle = "#111"; g.stroke();
+      g.fillStyle = big ? "#fff" : "#111"; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText(text, bx + bw / 2, by + bh / 2 + 1); g.restore();
+    }
+    function muDraw(now) {
+      const cv = cEl("cs-mu-cv"); if (!cv) return; const r = cv.getBoundingClientRect(), W = Math.round(r.width), H = Math.round(r.height); if (W < 40 || H < 40) return;
+      const d = Math.min(2, window.devicePixelRatio || 1); if (cv.width !== Math.round(W * d) || cv.height !== Math.round(H * d)) { cv.width = Math.round(W * d); cv.height = Math.round(H * d); }
+      const g = cv.getContext("2d"), m = gameState.casino.mus, reveal = !!m && (m.phase === "hand" || m.phase === "done") && !muBusy(); g.setTransform(d, 0, 0, d, 0, 0); g.clearRect(0, 0, W, H);
+      const bg = g.createRadialGradient(W / 2, H * .45, 20, W / 2, H * .5, Math.max(W, H) * .75); bg.addColorStop(0, "#1b8a62"); bg.addColorStop(.6, "#0e4a38"); bg.addColorStop(1, "#06241c"); g.fillStyle = bg; g.fillRect(0, 0, W, H);
+      g.lineWidth = 2; g.strokeStyle = "rgba(255,209,102,.22)"; g.beginPath(); g.ellipse(W / 2, H * .5, W * .47, H * .45, 0, 0, 7); g.stroke();
+      g.textAlign = "center"; g.textBaseline = "middle"; g.fillStyle = "rgba(255,255,255,.06)"; g.font = `900 ${Math.round(W * .24)}px Inter, sans-serif`; g.fillText("MUS", W / 2, H * .62);
+      const ax = Math.max(60, W * .17), P = [[W / 2, H - 28, "u"], [ax, H * .5 - 20, "r"], [W / 2, 30, "r"], [W - ax, H * .5 - 20, "l"]], cur = cMuCur && !cMuCur.sys ? cMuCur : null;
+      P.forEach(([x, y], i) => {
+        const team = i % 2, talk = cur && cur.seat === i;
+        if (talk) { g.save(); g.shadowColor = "#ffd166"; g.shadowBlur = 16; g.beginPath(); g.arc(x, y, 23, 0, 7); g.fillStyle = "rgba(255,209,102,.35)"; g.fill(); g.restore(); }
+        g.beginPath(); g.arc(x, y, 19, 0, 7); g.fillStyle = team ? "#8a1830" : "#0b6b82"; g.fill(); g.lineWidth = 2.5; g.strokeStyle = talk ? "#ffd166" : "rgba(255,255,255,.55)"; g.stroke();
+        g.font = "20px sans-serif"; g.fillStyle = "#fff"; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText(MU_EMO[i], x, y + 1);
+        if (m && m.mano === i) { g.beginPath(); g.arc(x + 15, y - 15, 8, 0, 7); g.fillStyle = "#ffd166"; g.fill(); g.fillStyle = "#3a2a08"; g.font = "900 9px Inter, sans-serif"; g.fillText("M", x + 15, y - 14.5); }
+        g.font = "800 11px Inter, sans-serif"; g.fillStyle = team ? "#ffc2cb" : "#b6f4ff";
+        if (i === 0) { g.textAlign = "left"; g.fillText("Tú", x + 28, y); } else { g.fillText(MUS_SEAT[i], x, y + 29); const cw = 22, ch = 31, x0 = x - (4 * cw + 9) / 2; for (let k = 0; k < 4; k++) muCardC(g, x0 + k * (cw + 3), y + 40, cw, ch, m ? m.hands[i][k] : 0, reveal); }
+      });
+      if (cur) muBubble(g, W, H, P[cur.seat][0], P[cur.seat][1], P[cur.seat][2], cur.text, now - cur.t0, cur.dur, cur.big);
+      if (cMuCur && cMuCur.sys) { // rótulo central: lance, resultado del envite, fin de mano…
+        const age = now - cMuCur.t0, a = Math.max(0, Math.min(1, age / 160, (cMuCur.dur - age) / 220)); g.font = "800 13px Inter, sans-serif";
+        const maxW = W - 44, lines = []; let ln = ""; cMuCur.text.split(" ").forEach(w => { const t2 = ln ? ln + " " + w : w; if (g.measureText(t2).width > maxW && ln) { lines.push(ln); ln = w; } else ln = t2; }); lines.push(ln);
+        const lh = 18, bh = lines.length * lh + 14, bw = Math.min(maxW, Math.max.apply(null, lines.map(l => g.measureText(l).width)) + 28), cy = Math.max(118, (104 + H * .5 - 42) / 2);
+        g.save(); g.globalAlpha = a; csRR(g, W / 2 - bw / 2, cy - bh / 2, bw, bh, 12); g.fillStyle = "rgba(6,14,28,.84)"; g.fill(); g.lineWidth = 1.5; g.strokeStyle = "rgba(255,209,102,.75)"; g.stroke();
+        g.fillStyle = "#ffe08a"; g.textAlign = "center"; g.textBaseline = "middle"; lines.forEach((l, i) => g.fillText(l, W / 2, cy - bh / 2 + 7 + lh * (i + .5))); g.restore();
+      }
+    }
     function muUI() {
-      const c = gameState.casino, m = c.mus, ctl = cEl("cs-mu-ctl"), seats = cEl("cs-mu-seats"), hand = cEl("cs-mu-hand"), info = cEl("cs-mu-info"), log = cEl("cs-mu-log");
+      const c = gameState.casino, m = c.mus, ctl = cEl("cs-mu-ctl"), hand = cEl("cs-mu-hand"), info = cEl("cs-mu-info"), wait = muBusy();
       const betRow = () => { const step = csN(cChip); return `<div class="mb-2 grid grid-cols-[1fr_auto_1fr] items-center gap-2"><button data-mu="minus" class="btn-juice min-h-[48px] rounded-xl border border-slate-600 text-sm font-extrabold text-slate-200">− ${step}</button><div class="text-center"><p class="text-[11px] text-slate-400">Entrada</p><b class="text-lg text-gold">${csN(c.musBet)}</b></div><button data-mu="plus" class="btn-juice min-h-[48px] rounded-xl border border-slate-600 text-sm font-extrabold text-slate-200">+ ${step}</button></div><button data-mu="start" class="btn-juice min-h-[52px] w-full rounded-xl bg-gold px-4 text-sm font-extrabold text-ink">${m ? "Nueva partida" : "Empezar partida"} · ${csN(c.musBet)}</button>`; };
       const btn = (a, l, cls, dis) => `<button data-mu="${a}" ${dis ? "disabled" : ""} class="btn-juice min-h-[52px] rounded-xl px-2 text-sm font-extrabold disabled:cursor-not-allowed disabled:opacity-40 ${cls}">${l}</button>`;
       if (!m) {
-        cEl("cs-mu-score").textContent = `A ${MUS_TARGET} piedras`; cEl("cs-mu-stake").textContent = ""; seats.innerHTML = ""; hand.innerHTML = ""; cEl("cs-mu-hint").textContent = ""; log.innerHTML = ""; info.textContent = "Pareja contra pareja: tú y tu compañero contra dos rivales."; ctl.innerHTML = betRow(); return;
+        cEl("cs-mu-score").textContent = `A ${MUS_TARGET} piedras`; cEl("cs-mu-stake").textContent = ""; hand.innerHTML = ""; cEl("cs-mu-hint").textContent = ""; info.textContent = "Pareja contra pareja: tú y tu compañero contra dos rivales."; ctl.innerHTML = betRow(); muKick(); return;
       }
-      const reveal = m.phase === "hand" || m.phase === "done", disc = m.phase === "disc"; if (!disc) cMuSel = [];
-      cEl("cs-mu-score").innerHTML = `Vosotros <b class="text-neon">${m.score[0]}</b> · Ellos <b class="text-danger">${m.score[1]}</b> · a ${m.target}`; cEl("cs-mu-stake").textContent = `Entrada ${csN(m.stake)}`;
-      seats.innerHTML = [1, 2, 3].map(s => `<div class="rounded-xl bg-black/20 p-2"><p class="mb-1 text-[11px] font-bold ${muTeam(s) === 0 ? "text-neon" : "text-slate-200"}">${MUS_SEAT[s]}${m.mano === s ? " · mano" : ""}</p><div class="flex justify-center gap-1">${m.hands[s].map(id => reveal ? muCardHtml(id, { sm: 1 }) : '<span class="cs-card cs-mu-back cs-sm"></span>').join("")}</div></div>`).join("");
+      const disc = m.phase === "disc" && !wait; if (m.phase !== "disc") cMuSel = []; if (!wait) cMuShown = m.score.slice();
+      cEl("cs-mu-score").innerHTML = `Vosotros <b class="text-neon">${cMuShown[0]}</b> · Ellos <b class="text-danger">${cMuShown[1]}</b> · a ${m.target}`; cEl("cs-mu-stake").textContent = `Entrada ${csN(m.stake)}`;
       hand.innerHTML = m.hands[0].map((id, i) => muCardHtml(id, { btn: disc, i, drop: disc && cMuSel[i] })).join("");
       cEl("cs-mu-hint").innerHTML = `${m.mano === 0 ? "Eres mano · " : ""}${muHint(m.hands[0])}`;
-      log.innerHTML = m.log.slice(-7).map(t => `<p>${t}</p>`).join(""); log.scrollTop = log.scrollHeight;
       const b = m.bet; let t = "", html = "";
       if (m.phase === "mus") { t = "¿Mus o no hay mus?"; html = `<div class="grid grid-cols-2 gap-2">${btn("mus", "Mus", "bg-electric text-ink")}${btn("cut", "No hay mus", "bg-gold text-ink")}</div>`; }
       else if (m.phase === "disc") { const n = cMuSel.filter(Boolean).length; t = "Toca las cartas que quieras descartar"; html = btn("disc", n ? `Descartar ${n}` : "Descartar", "w-full bg-gold text-ink", !n); }
@@ -1132,38 +1421,159 @@
       else if (m.phase === "next") { t = m.li >= 4 ? "Lances terminados" : "Lance resuelto"; html = btn("next", m.li >= 4 ? "Ver fin de la mano" : `Siguiente: ${MUS_LANCES[m.li]}`, "w-full bg-gold text-ink"); }
       else if (m.phase === "hand") { t = "Mano terminada"; html = btn("hand", "Nueva mano", "w-full bg-gold text-ink"); }
       else { const net = m.back - m.stake; t = m.winner === 0 ? `¡Ganáis! +${csN(net)} fichas` : `Perdéis la partida · −${csN(m.stake)}`; }
+      if (wait) { t = "…"; html = '<p class="text-center text-xs text-slate-300">La mesa está hablando…</p>'; }
       info.className = `my-3 min-h-[20px] text-center text-sm font-bold ${m.phase === "done" ? (m.winner === 0 ? "text-neon" : "text-danger") : "text-white"}`; info.textContent = t;
-      ctl.innerHTML = m.phase === "done" ? betRow() : html + `<button data-mu="quit" class="mt-3 block w-full text-center text-[11px] font-semibold text-slate-500 hover:text-white">Abandonar partida</button>`;
+      ctl.innerHTML = m.phase === "done" ? (wait ? html : betRow()) : html + `<button data-mu="quit" class="mt-3 block w-full text-center text-[11px] font-semibold text-slate-500 hover:text-white">Abandonar partida</button>`;
+      muKick();
     }
 
-    /* ---------- Tragaperras ---------- */
+
+    /* ---------- Tragaperras ICE QUEEN ----------
+       Canvas = fondo nocturno animado + rejilla 5x3 de cristal helado. UI inferior en HTML: CRÉDITOS (tus fichas), BANCO (premios por cobrar), PUNTOS (1 por giro + premio en ×),
+       PREMIO PARTIDA (último premio), indicadores de línea y DOBLE O NADA (50 %: dobla el último premio o lo pierde). Al salir al lobby el banco vuelve a tus fichas.
+       Anti-trampas: cada giro/doble se liquida y se guarda ANTES de animarse; la animación solo retrasa lo que se ve (cSlShow). */
+    const SL_STARS = Array.from({ length: 34 }, () => ({ x: Math.random(), y: Math.random() * .75, p: Math.random() * 6.28, r: .5 + Math.random() * 1.1 }));
+    const SL_FLAKES = Array.from({ length: 44 }, () => ({ x: Math.random(), y: Math.random(), r: .7 + Math.random() * 1.9, v: .02 + Math.random() * .05, s: Math.random() * 6.28 }));
+    const SL_SPARKS = Array.from({ length: 16 }, (_, i) => ({ x: Math.random(), y: Math.random(), p: Math.random() * 6.28, c: ["#7df9ff", "#ff6ad5", "#ffd166", "#63f5ae"][i % 4], r: 4 + Math.random() * 6 }));
+    function slFlake(g, x, y, r) { g.save(); g.translate(x, y); g.strokeStyle = "rgba(235,252,255,.95)"; g.lineWidth = 1.6; g.shadowColor = "#7df9ff"; g.shadowBlur = 8; for (let i = 0; i < 3; i++) { g.rotate(Math.PI / 3); g.beginPath(); g.moveTo(-r, 0); g.lineTo(r, 0); g.moveTo(r * .55, 0); g.lineTo(r * .8, r * .25); g.moveTo(r * .55, 0); g.lineTo(r * .8, -r * .25); g.moveTo(-r * .55, 0); g.lineTo(-r * .8, r * .25); g.moveTo(-r * .55, 0); g.lineTo(-r * .8, -r * .25); g.stroke(); } g.restore(); }
+    function slBg(g, W, H, t) {
+      const bg = g.createLinearGradient(0, 0, 0, H); bg.addColorStop(0, "#020a1f"); bg.addColorStop(.5, "#06214d"); bg.addColorStop(1, "#0b3f77"); g.fillStyle = bg; g.fillRect(0, 0, W, H);
+      const mn = g.createRadialGradient(W * .84, H * .1, 2, W * .84, H * .1, W * .4); mn.addColorStop(0, "rgba(210,242,255,.6)"); mn.addColorStop(.25, "rgba(120,200,255,.18)"); mn.addColorStop(1, "rgba(120,200,255,0)"); g.fillStyle = mn; g.fillRect(0, 0, W, H);
+      SL_STARS.forEach(s => { g.globalAlpha = .3 + .5 * Math.pow(Math.sin(t * 2 + s.p), 2); g.fillStyle = "#e6f6ff"; g.beginPath(); g.arc(s.x * W, s.y * H, s.r, 0, 7); g.fill(); }); g.globalAlpha = 1;
+      [["#35f2c8", .2, 0], ["#b45cff", .36, 2.1], ["#ff5cc8", .52, 4.2]].forEach(([col, by, ph]) => { // auroras
+        const base = H * by + Math.sin(t * .4 + ph) * 10, gr = g.createLinearGradient(0, base - 40, 0, base + 70); gr.addColorStop(0, "rgba(0,0,0,0)"); gr.addColorStop(.5, col + "3a"); gr.addColorStop(1, "rgba(0,0,0,0)");
+        g.fillStyle = gr; g.beginPath(); g.moveTo(0, base + 70); for (let x = 0; x <= W + 12; x += 12) g.lineTo(x, base + Math.sin(x * .016 + t * .6 + ph) * 18 + Math.sin(x * .04 + t) * 6); g.lineTo(W, base + 70); g.closePath(); g.fill();
+      });
+      g.fillStyle = "#0a2f5e"; g.beginPath(); g.moveTo(0, H); [[0, .78], [.14, .66], [.26, .8], [.42, .62], [.58, .79], [.74, .64], [.88, .78], [1, .68], [1, 1]].forEach(([x, y]) => g.lineTo(x * W, y * H)); g.closePath(); g.fill();
+      SL_FLAKES.forEach(f => { g.globalAlpha = .75; g.fillStyle = "#fff"; g.beginPath(); g.arc(f.x * W + Math.sin(t * .8 + f.s) * 8, ((f.y + t * f.v) % 1) * H, f.r, 0, 7); g.fill(); }); g.globalAlpha = 1;
+      SL_SPARKS.forEach(s => { const a = .5 + .5 * Math.sin(t * 2.4 + s.p); g.globalAlpha = a; csStar(g, s.x * W, s.y * H, s.r * a + 1, s.c, t * .3 + s.p); }); g.globalAlpha = 1;
+    }
+    function slTitle(g, W, cy, fs, t) {
+      g.save(); g.font = `900 ${fs}px Inter, sans-serif`; g.textAlign = "center"; g.textBaseline = "middle"; try { g.letterSpacing = Math.round(fs * .12) + "px"; } catch (_) { }
+      g.lineJoin = "round"; g.lineWidth = fs * .12; g.shadowColor = "#ff4fd8"; g.shadowBlur = 22 * (.75 + .25 * Math.sin(t * 2.2)); g.strokeStyle = "#ff4fd8"; g.strokeText("ICE QUEEN", W / 2, cy);
+      g.shadowColor = "#7df9ff"; g.shadowBlur = 14; g.fillStyle = "#eafcff"; g.fillText("ICE QUEEN", W / 2, cy); g.restore();
+      const off = Math.min(W * .4, fs * 4.6); slFlake(g, W / 2 - off, cy, fs * .42); slFlake(g, W / 2 + off, cy, fs * .42);
+    }
+    function slWild(g, sz, t, k) { // bloque de hielo con letras doradas y destellos dorados/verdes
+      const w = sz * .86, h = sz * .8; csRR(g, -w / 2, -h / 2, w, h, sz * .12);
+      const ig = g.createLinearGradient(-w / 2, -h / 2, w / 2, h / 2); ig.addColorStop(0, "rgba(238,253,255,.97)"); ig.addColorStop(.5, "rgba(120,205,255,.82)"); ig.addColorStop(1, "rgba(60,140,230,.88)");
+      g.save(); g.shadowColor = "#7df9ff"; g.shadowBlur = sz * .2; g.fillStyle = ig; g.fill(); g.restore(); g.lineWidth = 2; g.strokeStyle = "rgba(255,255,255,.95)"; g.stroke();
+      g.strokeStyle = "rgba(255,255,255,.55)"; g.lineWidth = 1.2; g.beginPath(); g.moveTo(-w * .42, -h * .1); g.lineTo(-w * .2, -h * .02); g.lineTo(-w * .28, h * .18); g.moveTo(w * .4, h * .22); g.lineTo(w * .22, h * .12); g.lineTo(w * .3, -h * .05); g.stroke();
+      g.fillStyle = "rgba(244,253,255,.95)"; for (let i = 0; i < 5; i++) { const x = -w / 2 + w * (i + .5) / 5, hh = h * (.12 + .07 * ((i * 3) % 3)); g.beginPath(); g.moveTo(x - w * .06, -h / 2 + 1); g.lineTo(x + w * .06, -h / 2 + 1); g.lineTo(x, -h / 2 + hh); g.closePath(); g.fill(); }
+      const fs = sz * .3; g.font = `900 ${fs}px Inter, sans-serif`; g.textAlign = "center"; g.textBaseline = "middle";
+      const gg = g.createLinearGradient(0, -fs / 2, 0, fs / 2); gg.addColorStop(0, "#fff6a8"); gg.addColorStop(.55, "#ffd23a"); gg.addColorStop(1, "#d98f00");
+      g.lineJoin = "round"; g.lineWidth = sz * .07; g.strokeStyle = "#0b3b5c"; g.strokeText("WILD", 0, sz * .03); g.save(); g.shadowColor = "#ffd23a"; g.shadowBlur = sz * .14; g.fillStyle = gg; g.fillText("WILD", 0, sz * .03); g.restore();
+      [[-.36, -.27, "#ffd84a"], [.37, -.2, "#4dff9a"], [.3, .3, "#ffd84a"], [-.33, .3, "#4dff9a"], [0, -.43, "#4dff9a"], [.06, .43, "#ffd84a"]].forEach(([x, y, c], i) => { const tw = .5 + .5 * Math.sin(t * 3.2 + i * 1.7 + k); csStar(g, x * sz, y * sz, sz * (.05 + .09 * tw), c, .3); });
+    }
+    function slSym(g, s, cx, cy, sz, t, k) {
+      g.save(); g.translate(cx, cy); if (s === 3) { slWild(g, sz, t, k); g.restore(); return; }
+      const col = [["#ffdcef", "#ff4aa8", "#ff3fa4", "#6b0a3f"], ["#efdcff", "#9a4dff", "#b26bff", "#3e0f7a"], ["#fffbe3", "#ffcf3d", "#ffe27a", "#7a5200"]][s], fs = sz * .74;
+      g.font = `900 ${fs}px Inter, "Segoe UI", sans-serif`; g.textAlign = "center"; g.textBaseline = "middle"; g.lineJoin = "round";
+      const gr = g.createLinearGradient(0, -fs / 2, 0, fs / 2); gr.addColorStop(0, col[0]); gr.addColorStop(1, col[1]);
+      g.shadowColor = col[2]; g.shadowBlur = sz * .22; g.lineWidth = sz * .09; g.strokeStyle = col[3]; g.strokeText(SL_LETTER[s], 0, sz * .03); g.shadowBlur = sz * .1; g.fillStyle = gr; g.fillText(SL_LETTER[s], 0, sz * .03); g.shadowBlur = 0;
+      const P = [[-.34, -.3], [.35, -.27], [.31, .31], [-.33, .34], [0, -.41], [.02, .4]], n = s === 2 ? 6 : 3; // letras "estrelladas": la A lleva más destellos
+      for (let i = 0; i < n; i++) { const tw = .5 + .5 * Math.sin(t * 3 + i * 1.7 + k); csStar(g, P[i][0] * sz, P[i][1] * sz, sz * (.05 + .07 * tw), s === 2 ? "#fff6c8" : "rgba(255,255,255,.95)", .2); }
+      g.restore();
+    }
+    function slCell(g, x, y, w, hot, t) { // casilla de cristal helado
+      csRR(g, x, y, w, w, w * .13); const gr = g.createLinearGradient(x, y, x + w, y + w); gr.addColorStop(0, "rgba(200,238,255,.34)"); gr.addColorStop(.5, "rgba(110,180,235,.16)"); gr.addColorStop(1, "rgba(60,120,210,.26)"); g.fillStyle = gr; g.fill();
+      if (hot) { const p = .5 + .5 * Math.sin(t * 6); g.fillStyle = `rgba(160,240,255,${.12 + .14 * p})`; g.fill(); g.save(); g.shadowColor = "#9ff3ff"; g.shadowBlur = 10 + 10 * p; g.lineWidth = 3; g.strokeStyle = `rgba(200,252,255,${.75 + .25 * p})`; g.stroke(); g.restore(); }
+      else { g.lineWidth = 2; g.strokeStyle = "rgba(215,245,255,.85)"; g.stroke(); }
+      g.save(); csRR(g, x, y, w, w, w * .13); g.clip(); g.fillStyle = "rgba(255,255,255,.14)"; g.beginPath(); g.moveTo(x, y + w * .55); g.lineTo(x + w * .55, y); g.lineTo(x + w * .8, y); g.lineTo(x, y + w * .8); g.closePath(); g.fill();
+      g.fillStyle = "rgba(235,250,255,.78)"; for (let i = 0; i < 3; i++) { const ix = x + w * (.2 + .3 * i), ih = w * (.07 + .04 * ((i + 1) % 3)); g.beginPath(); g.moveTo(ix - w * .05, y); g.lineTo(ix + w * .05, y); g.lineTo(ix, y + ih); g.closePath(); g.fill(); } g.restore();
+    }
+    function slDraw(now) {
+      const cv = cEl("cs-sl-cv"), c = gameState && gameState.casino, sl = c && c.sl; if (!cv || !sl || !Array.isArray(sl.last)) return;
+      const r = cv.getBoundingClientRect(), W = Math.round(r.width), H = Math.round(r.height); if (W < 60 || H < 60) return;
+      const d = Math.min(2, window.devicePixelRatio || 1); if (cv.width !== Math.round(W * d) || cv.height !== Math.round(H * d)) { cv.width = Math.round(W * d); cv.height = Math.round(H * d); }
+      const g = cv.getContext("2d"), t = now / 1000, anim = cSlAnim, gm = cSlGamble; g.setTransform(d, 0, 0, d, 0, 0); g.clearRect(0, 0, W, H);
+      slBg(g, W, H, t);
+      const ts = Math.min(34, W * .09), ty = 12 + ts / 2 + 4; slTitle(g, W, ty, ts, t);
+      const gap = Math.max(4, W * .012), padX = Math.max(16, W * .06), top = ty + ts / 2 + 22, cell = Math.min((W - padX * 2 - 4 * gap) / 5, (H - top - 18 - 2 * gap) / 3);
+      const gw = cell * 5 + gap * 4, gh = cell * 3 + gap * 2, gx = (W - gw) / 2, gy = top + Math.max(0, (H - top - 14 - gh) / 2), pad = 10;
+      const fx = gx - pad, fy = gy - pad, fw = gw + pad * 2, fh = gh + pad * 2; csRR(g, fx, fy, fw, fh, 18); g.fillStyle = "rgba(3,12,34,.64)"; g.fill();
+      const fg = g.createLinearGradient(fx, fy, fx + fw, fy + fh); fg.addColorStop(0, "#7df9ff"); fg.addColorStop(.5, "#ff6ad5"); fg.addColorStop(1, "#7df9ff"); g.save(); g.shadowColor = "#59d0ff"; g.shadowBlur = 16; g.lineWidth = 3; g.strokeStyle = fg; g.stroke(); g.restore();
+      g.fillStyle = "rgba(225,247,255,.88)"; for (let i = 0; i < 9; i++) { const ix = fx + fw * (i + .5) / 9, ih = 7 + ((i * 5) % 4) * 3; g.beginPath(); g.moveTo(ix - 6, fy + 1); g.lineTo(ix + 6, fy + 1); g.lineTo(ix, fy + ih); g.closePath(); g.fill(); }
+      const wins = !anim && !gm && cSlWins ? cSlWins.ev.wins : null, hot = new Set(); if (wins) wins.forEach(w => { for (let i = 0; i < w.n; i++) hot.add(i * 3 + SL_LINES[w.line][i]); });
+      for (let col = 0; col < 5; col++) {
+        const x = gx + col * (cell + gap);
+        if (anim) { // carrete girando: tira de símbolos que cae; la última es el resultado ya liquidado
+          const cd = anim.cols[col], el = now - anim.t0; let pos;
+          if (el >= cd.dur) { const s = el - cd.dur; pos = s < 180 ? .07 * Math.sin(s / 180 * Math.PI) : 0; } else { const p = el / cd.dur; pos = (cd.L - 3) * Math.pow(1 - p, 3); }
+          g.save(); g.beginPath(); g.rect(x - 3, gy - 3, cell + 6, gh + 6); g.clip();
+          for (let k = Math.max(0, Math.floor(pos) - 1); k <= Math.min(cd.L - 1, Math.ceil(pos) + 3); k++) { const y = gy + (k - pos) * (cell + gap); slCell(g, x, y, cell, false, t); slSym(g, cd.strip[k], x + cell / 2, y + cell / 2, cell, t, k); }
+          if (pos > .3) { g.fillStyle = "rgba(170,225,255,.1)"; g.fillRect(x, gy, cell, gh); } g.restore();
+        } else for (let rw = 0; rw < 3; rw++) { const y = gy + rw * (cell + gap), k = col * 3 + rw; slCell(g, x, y, cell, hot.has(k), t); slSym(g, sl.last[k], x + cell / 2, y + cell / 2, cell, t, k); }
+      }
+      if (wins) wins.forEach((w, wi) => { // líneas ganadoras con su número
+        const row = SL_LINES[w.line], col = SL_LCOL[w.line % 10]; g.save(); g.lineJoin = "round"; g.lineCap = "round"; g.shadowColor = col; g.shadowBlur = 12; g.strokeStyle = col; g.lineWidth = 4; g.globalAlpha = .55 + .35 * Math.sin(t * 7 + wi); g.beginPath();
+        for (let i = 0; i < w.n; i++) { const px = gx + i * (cell + gap) + cell / 2, py = gy + row[i] * (cell + gap) + cell / 2; i ? g.lineTo(px, py) : g.moveTo(px, py); } g.stroke(); g.restore();
+        g.beginPath(); g.arc(gx + 2, gy + row[0] * (cell + gap) + cell / 2, 9, 0, 7); g.fillStyle = col; g.fill(); g.fillStyle = "#06142c"; g.font = "900 10px Inter, sans-serif"; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText(String(w.line + 1), gx + 2, gy + row[0] * (cell + gap) + cell / 2 + .5);
+      });
+      if (gm) { // DOBLE O NADA: moneda que gira y se detiene en el resultado ya decidido
+        const p = Math.min(1, (now - gm.t0) / gm.dur), e = 1 - Math.pow(1 - p, 3), th = e * (6 * Math.PI + (gm.win ? 0 : Math.PI)), face = Math.cos(th) >= 0, R = Math.min(W, H) * .2, cx = W / 2, cy = H / 2 + 6;
+        g.fillStyle = "rgba(2,10,30,.78)"; g.fillRect(0, 0, W, H); g.textAlign = "center"; g.textBaseline = "middle"; g.fillStyle = "#ffd166"; g.font = `900 ${Math.round(W * .05)}px Inter, sans-serif`; g.fillText(`DOBLE O NADA · ${csN(gm.old)}`, W / 2, cy - R - 26);
+        g.save(); g.translate(cx, cy); g.scale(Math.max(.04, Math.abs(Math.cos(th))), 1); g.beginPath(); g.arc(0, 0, R, 0, 7); const cg = g.createRadialGradient(-R * .3, -R * .3, 2, 0, 0, R);
+        if (face) { cg.addColorStop(0, "#fff3a6"); cg.addColorStop(1, "#e0a000"); } else { cg.addColorStop(0, "#5b6b86"); cg.addColorStop(1, "#1a2336"); } g.fillStyle = cg; g.shadowColor = face ? "#ffd166" : "#7df9ff"; g.shadowBlur = 20; g.fill(); g.shadowBlur = 0; g.lineWidth = 4; g.strokeStyle = face ? "#fff6c8" : "#9fb3cc"; g.stroke();
+        g.fillStyle = face ? "#5a3a00" : "#e8f1ff"; g.font = `900 ${Math.round(R * .62)}px Inter, sans-serif`; g.fillText(face ? "×2" : "0", 0, 2); g.restore();
+        if (p > .88) { g.font = `900 ${Math.round(W * .075)}px Inter, sans-serif`; g.fillStyle = gm.win ? "#63f5ae" : "#ff5d75"; g.shadowColor = g.fillStyle; g.shadowBlur = 14; g.fillText(gm.win ? `¡DOBLE! +${csN(gm.old)}` : "¡NADA!", W / 2, cy + R + 34); g.shadowBlur = 0; }
+      }
+    }
+    function slLoopOn() { return cOpen && cTab === "sl" && !cEl("casino").classList.contains("hidden"); }
+    function slKick() { if (!cSlRaf && slLoopOn()) cSlRaf = requestAnimationFrame(slFrame); }
+    function slFrame(now) { cSlRaf = 0; if (!slLoopOn()) return; slDraw(now); cSlRaf = requestAnimationFrame(slFrame); }
     function slUI() {
-      const c = gameState.casino, busy = cBusy.sl;
-      if (!busy) [0, 1, 2].forEach(i => { const el = cEl("cs-reel-" + i); el.innerHTML = slHtml(c.sl.last[i]); el.style.opacity = ""; });
-      cEl("cs-sl-msg").innerHTML = busy ? "Girando…" : (cSlMsg || "Elige ficha y gira");
-      const btn = cEl("cs-sl-btn"); btn.disabled = busy; btn.textContent = `Girar · ${csN(cChip)} ${cChip === 1 ? "ficha" : "fichas"}`;
+      const c = gameState.casino, sl = c.sl, busy = cBusy.sl, sh = cSlShow, lines = sl.lines, bet = cChip * lines;
+      cEl("sl-cred").textContent = csN(c.chips - cHold); cEl("sl-bank").textContent = csN(sh.bank ?? sl.bank); cEl("sl-pts").textContent = csN(sl.pts); cEl("sl-prize").textContent = csN(sh.prize ?? sl.prize);
+      cEl("sl-bet").innerHTML = `${csN(bet)}<small>${csN(cChip)} × ${lines}</small>`; cEl("sl-lines").innerHTML = `LÍNEAS<br><b>${lines}</b>`;
+      const won = new Set(!busy && cSlWins ? cSlWins.ev.wins.map(w => w.line) : []);
+      document.querySelectorAll("#sl-lamps [data-lamp]").forEach(l => { const i = +l.dataset.lamp; l.classList.toggle("on", i < lines); l.classList.toggle("win", won.has(i)); });
+      cEl("cs-sl-msg").innerHTML = busy ? "Girando…" : (cSlMsg || "Elige línea y apuesta, y gira");
+      cEl("sl-spin").disabled = busy; cEl("sl-lines").disabled = busy; cEl("sl-collect").disabled = busy || sl.bank < 1; cEl("sl-gamble").disabled = busy || !(sl.prize > 0 && sl.bank >= sl.prize);
+      slKick();
     }
+    function slAct(a) {
+      casinoEnsure(); const sl = gameState.casino.sl;
+      if (a === "spin") return slSpin(); if (a === "gamble") return slGamble(); if (cBusy.sl) return;
+      if (a === "collect") { if (slCollect(false)) casinoUI(); }
+      else if (a === "lines") { sl.lines = SL_LINE_OPTS[(SL_LINE_OPTS.indexOf(sl.lines) + 1) % SL_LINE_OPTS.length]; beep(560, .04, "triangle", .03); save(); casinoUI(); }
+    }
+    function slCollect(silent) { // BANCO → créditos (fichas)
+      const c = gameState.casino, sl = c && c.sl; if (!sl || cBusy.sl || sl.bank < 1) return false;
+      const n = sl.bank; c.chips += n; sl.bank = 0; cSlShow = { bank: null, prize: null }; save(); if (!silent) { beep(880, .1, "sine", .04); showToast("Banco cobrado", `+${csN(n)} fichas a tus créditos.`, "neon"); } return true;
+    }
+    function slClamp(c) { const sl = c.sl; if (sl.bank > SL_BANK_CAP) { c.chips += sl.bank - SL_BANK_CAP; sl.bank = SL_BANK_CAP; } }
     function slSpin() {
-      casinoEnsure(); const c = gameState.casino; if (cBusy.sl) return;
-      if (c.chips < cChip) return showToast("Fichas insuficientes", "Cambia dinero por fichas o baja la apuesta.", "danger");
-      const r = [slPick(), slPick(), slPick()], bet = cChip, mult = slMult(r), back = bet * mult, ref = cRef;
-      c.chips += back - bet; csRecord(bet, back); c.sl.last = r; cSlMsg = ""; cBusy.sl = true; cHold += back; save(); casinoUI(); beep(400, .08, "square", .03);
-      const els = [0, 1, 2].map(i => cEl("cs-reel-" + i)), stop = [650, 1100, 1550], t0 = performance.now(), done = [false, false, false];
-      clearInterval(cSlTimer);
-      cSlTimer = setInterval(() => {
-        const t = performance.now() - t0;
-        els.forEach((el, i) => {
-          if (t < stop[i]) { el.innerHTML = slHtml(Math.floor(Math.random() * 5)); el.style.opacity = ".7"; }
-          else if (!done[i]) { done[i] = true; el.innerHTML = slHtml(r[i]); el.style.opacity = ""; el.classList.remove("pop-in"); void el.offsetWidth; el.classList.add("pop-in"); beep(520 + i * 120, .07, "triangle", .04); }
-        });
-        if (t < stop[2] + 60) return;
-        clearInterval(cSlTimer); if (cRef !== ref) return;
-        cBusy.sl = false; cHold = Math.max(0, cHold - back); const net = back - bet;
-        cSlMsg = net > 0 ? `<span class="text-neon">+${csN(net)}</span> · ×${mult}` : mult === 1 ? "Dos cerezas: recuperas la apuesta" : `<span class="text-danger">Sin premio · −${csN(bet)}</span>`;
-        casinoUI(); csFx(net, bet, mult >= 40 ? "¡Jackpot en la tragaperras!" : "Tragaperras");
-      }, 80);
+      casinoEnsure(); const c = gameState.casino, sl = c.sl; if (cBusy.sl) return;
+      const lines = sl.lines, per = cChip, bet = per * lines;
+      if (c.chips < bet && sl.bank > 0) { c.chips += sl.bank; sl.bank = 0; } // si no llegas a la apuesta, el banco te ayuda a seguir
+      if (c.chips < bet) return showToast("Fichas insuficientes", `Girar con ${lines} ${lines === 1 ? "línea" : "líneas"} cuesta ${csN(bet)} fichas. Cambia dinero por fichas o baja la apuesta.`, "danger");
+      const grid = slGrid(), ev = slEval(grid, lines), back = ev.mult * per, pre = sl.bank, ref = cRef;
+      c.chips -= bet; sl.bank += back; sl.prize = back; sl.pts += 1 + ev.mult; sl.last = grid; csRecord(bet, back); slClamp(c);
+      cSlShow = { bank: pre, prize: 0 }; cSlWins = null; cSlMsg = ""; cBusy.sl = true; beep(400, .08, "square", .03); save(); casinoUI();
+      const t0 = performance.now(), cols = [0, 1, 2, 3, 4].map(i => { const L = 16 + i * 7, strip = Array.from({ length: L }, () => slPick(i)); for (let r = 0; r < 3; r++) strip[r] = grid[i * 3 + r]; return { strip, L, dur: 1000 + i * 330 }; });
+      const a = cSlAnim = { t0, cols, ref, bet, back, ev }; slKick();
+      cols.forEach((cd, i) => setTimeout(() => { if (cSlAnim === a) beep(520 + i * 90, .07, "triangle", .04); }, cd.dur));
+      setTimeout(() => slFinish(a), cols[4].dur + 260);
     }
-    Modules.casino.onEnter = () => { casinoEnsure(); casinoBuild(); casinoUI(); };
+    function slFinish(a) {
+      if (cSlAnim !== a) return; cSlAnim = null; if (a.ref !== cRef) return;
+      cBusy.sl = false; cSlShow = { bank: null, prize: null }; cSlWins = a.ev.wins.length ? { ev: a.ev } : null; const net = a.back - a.bet, n = a.ev.wins.length;
+      cSlMsg = a.back > 0 ? `<span class="text-neon">+${csN(a.back)}</span>&nbsp;· ${n} ${n === 1 ? "línea" : "líneas"} · neto ${net >= 0 ? "+" : "−"}${csN(Math.abs(net))}` : `<span class="text-danger">Sin premio · −${csN(a.bet)}</span>`;
+      casinoUI(); csFx(net, a.bet, a.ev.wins.some(w => w.pay >= 40) ? "¡Gran premio Ice Queen!" : "Ice Queen");
+    }
+    function slGamble() { // DOBLE O NADA sobre el último premio (50 %, sin ventaja para la casa)
+      casinoEnsure(); const c = gameState.casino, sl = c.sl; if (cBusy.sl || !(sl.prize > 0 && sl.bank >= sl.prize)) return;
+      if (sl.prize * 2 > SL_BANK_CAP) return showToast("Límite alcanzado", "Cobra tu banco: no se puede doblar más.", "electric");
+      const win = Math.random() < .5, old = sl.prize, pre = sl.bank, ref = cRef; sl.bank += win ? old : -old; sl.prize = win ? old * 2 : 0; c.stats.back += win ? old : -old; slClamp(c);
+      cSlShow = { bank: pre, prize: old }; cSlWins = null; cSlMsg = ""; cBusy.sl = true; beep(300, .1, "triangle", .04); save(); casinoUI();
+      const a = cSlGamble = { t0: performance.now(), dur: 1900, win, old }; slKick();
+      setTimeout(() => {
+        if (cSlGamble !== a) return; cSlGamble = null; if (cRef !== ref) return; cBusy.sl = false; cSlShow = { bank: null, prize: null };
+        cSlMsg = win ? `<span class="text-neon">¡Doble! Premio ${csN(old * 2)}</span>` : `<span class="text-danger">Nada · pierdes ${csN(old)}</span>`; casinoUI(); csFx(win ? old : -old, old, "Doble o nada");
+      }, a.dur + 250);
+    }
+    Modules.casino.onEnter = () => { cOpen = false; casinoEnsure(); casinoBuild(); casinoUI(); };
 
     /* ============ NEGOCIOS / INMOBILIARIA · FASE 4 · PARTE 2 (catálogo + UI + lógica de ingresos) ============
        Economía: amortización de ~73 h (quiosco) a ~59 h (torre); mejora nivel n→n+1 cuesta precio × 0.6 × n y suma +25 % de ingresos base.
