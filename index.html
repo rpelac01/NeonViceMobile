@@ -246,6 +246,13 @@
     @keyframes rlPaint { 0% { transform: scale(1); filter: brightness(1); } 35% { transform: scale(1.18); filter: brightness(1.8); box-shadow: 0 0 10px 2px rgba(255,209,102,.9); } 100% { transform: scale(1); filter: brightness(1); } }
     #cs-game[data-g="rl"] .cs-cell.rl-paint { animation: rlPaint .28s ease-out; position: relative; z-index: 2; }
     #cs-game[data-g="rl"] .cs-cell:disabled { opacity: 1; }
+      /* ===== RULETA · FASE 3: fichas apiladas ===== */
+    #cs-p-rl .cs-badge { position: absolute; inset: 0; top: 0; right: 0; min-width: 0; height: auto; padding: 0; border-radius: 0; background: none; box-shadow: none; pointer-events: none; display: block; }
+    #cs-p-rl .cs-badge.hidden { display: none; }
+    #cs-p-rl .rl-chip { --cd: clamp(18px, 3.3dvh, 26px); position: absolute; left: 50%; top: 50%; width: min(var(--cd), 94%); aspect-ratio: 1; height: auto; box-sizing: border-box; display: grid; place-items: center; border-radius: 50%; background: var(--c); color: var(--f); font: 900 clamp(7px, 1.2dvh, 9px)/1 Inter, sans-serif; font-style: normal; letter-spacing: -.03em; border: 2px dashed rgba(255,255,255,.9); box-shadow: 0 2px 0 rgba(0,0,0,.6), 0 0 0 1px rgba(0,0,0,.35), inset 0 0 0 2px var(--c), inset 0 0 5px rgba(0,0,0,.28); transform: translate(-50%, calc(-50% + 2px - var(--i) * 3px)); text-shadow: none; overflow: hidden; white-space: nowrap; }
+    @keyframes rlDrop { 0% { transform: translate(-50%, calc(-50% - 16px - var(--i) * 3px)) scale(1.35); opacity: 0; } 70% { opacity: 1; } 100% { transform: translate(-50%, calc(-50% + 2px - var(--i) * 3px)) scale(1); opacity: 1; } }
+    #cs-p-rl .rl-drop .rl-chip:last-child { animation: rlDrop .2s cubic-bezier(.3, 1.4, .6, 1); }
+    #cs-p-rl .cs-cell { overflow: visible; }
   </style>
 </head>
 <body>
@@ -876,12 +883,25 @@
     }
     function rlUI() {
       const c = gameState.casino, rl = c.rl, tot = csSum(rl.bets), busy = cBusy.rl, hist = rl.hist.slice(busy ? 1 : 0), dot = n => `<span class="cs-dot" style="background:${RL_COL[rlColor(n)]}">${n}</span>`;
-      document.querySelectorAll("#cs-p-rl [data-bet]").forEach(b => { const v = rl.bets[b.dataset.bet] || 0, bd = b.lastElementChild; bd.textContent = csShort(v); bd.classList.toggle("hidden", !v); b.disabled = busy; });
+      document.querySelectorAll("#cs-p-rl [data-bet]").forEach(b => { const v = rl.bets[b.dataset.bet] || 0, bd = b.lastElementChild; rlBadge(bd, v); b.disabled = busy; });
       cEl("cs-rl-sum").innerHTML = `Apostado <b class="text-gold">${csN(tot)}</b> · Libres <b class="text-white">${csN(c.chips - cHold)}</b>`;
       cEl("cs-rl-hist").innerHTML = hist.map(dot).join("") || '<span class="text-[11px] text-slate-300">Aún no ha salido ningún número</span>';
       cEl("cs-rl-res").innerHTML = busy ? "La bola gira…" : (cRlMsg || (hist.length ? `Último número: ${dot(hist[0])}` : "Haz tus apuestas"));
       document.querySelectorAll("#cs-p-rl [data-sp]").forEach(b => b.disabled = busy); cEl("cs-rl-undo").disabled = busy || !rl.stack.length; cEl("cs-rl-clear").disabled = busy || !tot; cEl("cs-rl-again").disabled = busy || !csSum(rl.last); cEl("cs-rl-spin").disabled = busy || !tot;
       if (!busy) { if (cRot === null) cRot = hist.length ? -RL_ORDER.indexOf(hist[0]) * Math.PI * 2 / 37 : 0; rlDraw(cRot, -Math.PI / 2, hist.length ? "pocket" : undefined); }
+    }
+    /* ---------- FASE 3: fichas apiladas dibujadas sobre las casillas ----------
+       El importe se descompone en fichas reales (500/100/25/5/1, máx. 4 visibles); la de arriba es la de mayor valor y lleva el total exacto. */
+    function rlChips(v) {
+      if (!v) return ""; const parts = []; let r = v;
+      for (let i = CS_CHIPS.length - 1; i >= 0 && r > 0 && parts.length < 4; i--) { let q = Math.floor(r / CS_CHIPS[i].v); while (q-- > 0 && parts.length < 4) { parts.push(CS_CHIPS[i]); r -= CS_CHIPS[i].v; } }
+      if (!parts.length) parts.push(CS_CHIPS[0]);
+      return parts.reverse().map((k, i) => `<b class="rl-chip" style="--c:${k.bg};--f:${k.fg};--i:${i}">${i === parts.length - 1 ? csShort(v) : ""}</b>`).join("");
+    }
+    function rlBadge(bd, v) {
+      const prev = +bd.dataset.v || 0; bd.dataset.v = v;
+      if (v === prev && bd.dataset.r) return;                  // sin cambios: no repintar (evita repetir la animación)
+      bd.dataset.r = "1"; bd.innerHTML = rlChips(v); bd.classList.toggle("hidden", !v); bd.classList.toggle("rl-drop", v > prev);
     }
     /* Coloca UNA ficha sin tocar la UI. Devuelve "ok" | "busy" | "chips" | "max". grp agrupa las fichas de un mismo trazo para que "Deshacer" quite el trazo entero. */
     function rlPlace(key, grp) {
@@ -902,7 +922,7 @@
     const RL_PAINT_GAP = 600, rlLastHit = {};
     function rlLive(key, b) {
       const c = gameState.casino, rl = c.rl, v = rl.bets[key] || 0, bd = b.lastElementChild, tot = csSum(rl.bets);
-      bd.textContent = csShort(v); bd.classList.toggle("hidden", !v);
+      rlBadge(bd, v);
       cEl("cs-rl-sum").innerHTML = `Apostado <b class="text-gold">${csN(tot)}</b> · Libres <b class="text-white">${csN(c.chips - cHold)}</b>`;
       cEl("cs-chips-g").textContent = csN(c.chips - cHold); cEl("cs-chips").textContent = csN(c.chips - cHold);
       cEl("cs-rl-undo").disabled = false; cEl("cs-rl-clear").disabled = false; cEl("cs-rl-spin").disabled = false;
